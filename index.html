@@ -88,12 +88,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .play-progress-bar{width:100%;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;}
 .play-progress-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .3s;}
 .play-score{font-size:.85rem;font-weight:700;color:var(--green);flex-shrink:0;}
-.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px 10px 16px;width:100%;display:flex;flex-direction:column;align-items:center;}
+.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px 4px 16px;width:100%;display:flex;flex-direction:column;align-items:center;}
 .question-prompt{font-size:1.3rem;font-weight:900;color:var(--warm-700);text-align:center;margin-bottom:20px;line-height:1.3;}
 
 /* Item cards */
-.compare-row{display:flex;gap:10px;justify-content:center;width:100%;margin-bottom:18px;}
-.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:12px 6px 10px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;}
+.compare-row{display:flex;gap:6px;justify-content:center;width:100%;margin-bottom:18px;}
+.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:14px 4px 10px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;}
 .item-card:hover{border-color:var(--blue);background:#EEF6FD;}
 .item-card:active{transform:scale(.96);}
 .item-card.card-correct{border-color:#5BC886!important;background:#D4F5E0!important;}
@@ -101,7 +101,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .item-card.card-locked{pointer-events:none;}
 .item-label{display:none;}
 .item-visual{display:flex;align-items:center;justify-content:center;width:100%;min-height:110px;}
-.item-visual svg{width:100%;height:auto;display:block;}
+.item-visual svg{width:100%!important;height:auto!important;display:block;}
 
 
 .feedback{font-size:1rem;font-weight:700;text-align:center;padding:10px 0;min-height:42px;}
@@ -475,9 +475,10 @@ const MODES = {
 };
 
 /* ══ SVG 그리기 ══ */
-const MANY_SHAPES = ['circle','square','triangle','star','heart'];
+const MANY_SHAPES = ['circle','square','triangle','star','heart','cylinder','cube','sphere'];
 const COLOR_PALETTE = ['#6BADE8','#F0A050','#5BC886','#C080D0','#E88070','#60B8D8','#D4A850','#8FB8E8'];
-const SHAPE_MODES = ['big','many']; // 모양 변화가 있는 모드
+const SHAPE_MODES = ['big','many'];
+const WIDE_THICK_SHAPES = ['cylinder','cube','sphere'];
 function shapeAt(shape, cx, cy, r, color) {
   switch(shape) {
     case 'circle': return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>`;
@@ -487,7 +488,26 @@ function shapeAt(shape, cx, cy, r, color) {
       let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rad=i%2===0?r:r*.4; pts+=`${cx+Math.cos(a)*rad},${cy+Math.sin(a)*rad} `;}
       return `<polygon points="${pts.trim()}" fill="${color}" opacity=".85"/>`;
     }
-    case 'heart': { const s=r*1.1; return `<path d="M${cx},${cy+s*.6} C${cx},${cy+s*.6} ${cx-s*1.4},${cy} ${cx-s*1.4},${cy-s*.4} C${cx-s*1.4},${cy-s*1.0} ${cx-s*.7},${cy-s*1.2} ${cx},${cy-s*.55} C${cx+s*.7},${cy-s*1.2} ${cx+s*1.4},${cy-s*1.0} ${cx+s*1.4},${cy-s*.4} C${cx+s*1.4},${cy} ${cx},${cy+s*.6} ${cx},${cy+s*.6}Z" fill="${color}" opacity=".85"/>`; }
+    case 'heart': {
+      // fits within cx±r, cy-r*0.85 ~ cy+r (bottom tip)
+      return `<path d="M${cx},${cy+r} C${cx-r*.4},${cy+r*.5} ${cx-r},${cy+r*.05} ${cx-r},${cy-r*.25} C${cx-r},${cy-r*.78} ${cx-r*.35},${cy-r*.95} ${cx},${cy-r*.48} C${cx+r*.35},${cy-r*.95} ${cx+r},${cy-r*.78} ${cx+r},${cy-r*.25} C${cx+r},${cy+r*.05} ${cx+r*.4},${cy+r*.5} ${cx},${cy+r}Z" fill="${color}" opacity=".85"/>`;
+    }
+    case 'cylinder': {
+      const ry=r*.3, h=r*1.7, top=cy-h/2+ry, bot=cy+h/2-ry;
+      return `<ellipse cx="${cx}" cy="${bot}" rx="${r}" ry="${ry}" fill="${color}" opacity=".65"/>
+<rect x="${cx-r}" y="${top}" width="${r*2}" height="${bot-top}" fill="${color}" opacity=".85"/>
+<ellipse cx="${cx}" cy="${top}" rx="${r}" ry="${ry}" fill="${color}" opacity=".95"/>`;
+    }
+    case 'cube': {
+      const s=r*1.3, ox=s*.38, oy=s*.24, x0=cx-s/2, y0=cy-s/2+oy/2;
+      return `<polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+ox+s},${y0-oy} ${x0+s},${y0}" fill="${color}" opacity=".6"/>
+<rect x="${x0}" y="${y0}" width="${s}" height="${s}" rx="2" fill="${color}" opacity=".85"/>
+<polygon points="${x0+s},${y0} ${x0+s+ox},${y0-oy} ${x0+s+ox},${y0-oy+s} ${x0+s},${y0+s}" fill="${color}" opacity=".5"/>`;
+    }
+    case 'sphere': {
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>
+<ellipse cx="${cx-r*.25}" cy="${cy-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>`;
+    }
   }
 }
 
@@ -501,53 +521,94 @@ function drawItem(modeId, level, shape, color, lineStyle) {
     }
     case 'long': {
       const w = [26, 46, 68][level];
-      const x0 = (80 - w) / 2;
-      const x1 = x0 + w;
-      const cy = 40;
+      const x0 = (80 - w) / 2, cy = 40;
       const style = lineStyle || 'straight';
       if (style === 'straight') {
-        return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy - 6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
       } else if (style === 'zigzag') {
-        const amp = 9;
-        const nSegs = Math.max(2, Math.round(w / 12));
-        const segW = w / nSegs;
-        let pts = `${x0},${cy}`;
-        for (let i = 1; i <= nSegs; i++) {
-          const x = x0 + i * segW;
-          const y = cy + (i % 2 === 1 ? -amp : amp);
-          pts += ` ${x},${y}`;
-        }
+        const amp=9, nSegs=Math.max(2,Math.round(w/12)), segW=w/nSegs;
+        let pts=`${x0},${cy}`;
+        for(let i=1;i<=nSegs;i++) pts+=` ${x0+i*segW},${cy+(i%2===1?-amp:amp)}`;
         return `<svg viewBox="0 0 80 80" width="80" height="72"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      } else {
-        // wavy
-        const amp = 14;
-        const nCycles = Math.max(1, Math.round(w / 18));
-        const halfW = w / (nCycles * 2);
-        let d = `M${x0},${cy}`;
-        for (let i = 0; i < nCycles * 2; i++) {
-          const xStart = x0 + i * halfW;
-          const xEnd = xStart + halfW;
-          const xMid = (xStart + xEnd) / 2;
-          const yCtrl = cy + (i % 2 === 0 ? -amp : amp);
-          d += ` Q${xMid},${yCtrl} ${xEnd},${cy}`;
-        }
+      } else if (style === 'wavy') {
+        const amp=14, nCycles=Math.max(1,Math.round(w/18)), halfW=w/(nCycles*2);
+        let d=`M${x0},${cy}`;
+        for(let i=0;i<nCycles*2;i++){const xs=x0+i*halfW,xe=xs+halfW;d+=` Q${(xs+xe)/2},${cy+(i%2===0?-amp:amp)} ${xe},${cy}`;}
         return `<svg viewBox="0 0 80 80" width="80" height="72"><path d="${d}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/></svg>`;
+      } else if (style === 'cylinder') {
+        const ry=9, bodyW=Math.max(1,w-ry*2);
+        return `<svg viewBox="0 0 80 80" width="80" height="72">
+          <rect x="${x0+ry}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="${col}" opacity=".85"/>
+          <circle cx="${x0+ry+bodyW}" cy="${cy}" r="${ry}" fill="${col}" opacity=".7"/>
+          <circle cx="${x0+ry}" cy="${cy}" r="${ry}" fill="${col}" opacity=".95"/>
+        </svg>`;
+      } else {
+        // cube
+        const bh=16, ox=5, oy=5, y0=32;
+        return `<svg viewBox="0 0 80 80" width="80" height="72">
+          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".62"/>
+          <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
+          <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
+        </svg>`;
       }
     }
     case 'wide': {
-      const w = [16, 42, 68][level];
-      const h = 26;
-      const x = (80 - w) / 2, y = (80 - h) / 2;
-      return `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${col}" opacity=".85"/></svg>`;
+      if (shape === 'cylinder') {
+        const w=[22,46,70][level], h=22, r=h/2, bodyW=Math.max(0,w-h), x0=(80-w)/2;
+        return `<svg viewBox="0 0 80 80" width="80" height="64">
+          <rect x="${x0+r}" y="${40-r}" width="${bodyW}" height="${h}" fill="${col}" opacity=".85"/>
+          <circle cx="${x0+r}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+          <circle cx="${x0+r+bodyW}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+        </svg>`;
+      } else if (shape === 'cube') {
+        const w=[18,42,66][level], bh=22, ox=8, oy=6, x0=(80-w)/2, y0=37;
+        return `<svg viewBox="0 0 80 80" width="80" height="64">
+          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".6"/>
+          <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
+          <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
+        </svg>`;
+      } else if (shape === 'sphere') {
+        const r=[13,23,35][level];
+        return `<svg viewBox="0 0 80 80" width="80" height="64">
+          <circle cx="40" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+          <ellipse cx="${40-r*.25}" cy="${40-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>
+        </svg>`;
+      } else {
+        const w=[16,42,68][level], h=26, x=(80-w)/2, y=(80-h)/2;
+        return `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${col}" opacity=".85"/></svg>`;
+      }
     }
     case 'thick': {
-      const sw = [4, 11, 22][level];
-      return `<svg viewBox="0 0 80 80" width="64" height="72"><line x1="40" y1="8" x2="40" y2="72" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
+      if (shape === 'cylinder') {
+        const d=[8,18,30][level], r=d/2, ry=r*.32, h=50, top=15, bot=top+h-ry;
+        return `<svg viewBox="0 0 80 80" width="64" height="72">
+          <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="${col}" opacity=".65"/>
+          <rect x="${40-r}" y="${top+ry}" width="${d}" height="${h-ry*2}" fill="${col}" opacity=".85"/>
+          <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
+        </svg>`;
+      } else if (shape === 'cube') {
+        const sw=[8,18,30][level], h=50, ox=6, oy=5, x0=40-sw/2, y0=15;
+        return `<svg viewBox="0 0 80 80" width="64" height="72">
+          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="${col}" opacity=".6"/>
+          <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="${col}" opacity=".85"/>
+          <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="${col}" opacity=".5"/>
+        </svg>`;
+      } else if (shape === 'sphere') {
+        const r=[10,19,30][level];
+        return `<svg viewBox="0 0 80 80" width="64" height="72">
+          <circle cx="40" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+          <ellipse cx="${40-r*.25}" cy="${40-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>
+        </svg>`;
+      } else {
+        const sw=[4,11,22][level];
+        return `<svg viewBox="0 0 80 80" width="64" height="72"><line x1="40" y1="8" x2="40" y2="72" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
+      }
     }
     case 'deep': {
-      const pct = [0.18, 0.55, 0.90][level];
+      // 깊다 = 빈 공간(구멍 깊이)이 크다 → level 높을수록 채워진 부분(흙)이 적다
+      const fillPct = [0.85, 0.50, 0.15][level];
       const ch = 56, cTop = 8;
-      const fh = Math.round(ch * pct);
+      const fh = Math.round(ch * fillPct);
       const fy = cTop + ch - fh;
       return `<svg viewBox="0 0 80 80" width="68" height="72">
         <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
@@ -596,9 +657,11 @@ function generateQuestion(modeId, type) {
   const correct = items.find(it => it.level === targetLevel).label;
   const m = MODES[modeId];
   const qkey = type === '2way' ? (direction === 'max' ? 'q2max' : 'q2min') : (direction === 'max' ? 'q3max' : 'q3min');
-  const shape = SHAPE_MODES.includes(modeId) ? MANY_SHAPES[Math.floor(Math.random() * MANY_SHAPES.length)] : null;
+  const shapePool = SHAPE_MODES.includes(modeId) ? MANY_SHAPES
+    : (modeId === 'wide' || modeId === 'thick') ? WIDE_THICK_SHAPES : null;
+  const shape = shapePool ? shapePool[Math.floor(Math.random() * shapePool.length)] : null;
   const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
-  const LINE_STYLES = ['straight', 'zigzag', 'wavy'];
+  const LINE_STYLES = ['straight', 'zigzag', 'wavy', 'cylinder', 'cube'];
   const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
   return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle };
 }
