@@ -573,7 +573,7 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true) {
           ? `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`
           : `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="none" stroke="${col}" stroke-width="3"/></svg>`;
       } else if (style === 'zigzag') {
-        const amp=9, nSegs=Math.max(2,Math.round(w/12)), segW=w/nSegs;
+        const amp=6, nSegs=Math.max(2,Math.round(w/12)), segW=w/nSegs;
         let pts=`${x0},${cy}`;
         for(let i=1;i<=nSegs;i++) pts+=` ${x0+i*segW},${cy+(i%2===1?-amp:amp)}`;
         return `<svg viewBox="0 0 80 80" width="80" height="72"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
