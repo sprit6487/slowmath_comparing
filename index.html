@@ -88,20 +88,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .play-progress-bar{width:100%;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;}
 .play-progress-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .3s;}
 .play-score{font-size:.85rem;font-weight:700;color:var(--green);flex-shrink:0;}
-.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px 16px 16px;width:100%;display:flex;flex-direction:column;align-items:center;}
+.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px 10px 16px;width:100%;display:flex;flex-direction:column;align-items:center;}
 .question-prompt{font-size:1.3rem;font-weight:900;color:var(--warm-700);text-align:center;margin-bottom:20px;line-height:1.3;}
 
 /* Item cards */
-.compare-row{display:flex;gap:8px;justify-content:center;width:100%;margin-bottom:18px;}
-.item-card{flex:1;border:2px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;}
+.compare-row{display:flex;gap:10px;justify-content:center;width:100%;margin-bottom:18px;}
+.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:12px 6px 10px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;}
 .item-card:hover{border-color:var(--blue);background:#EEF6FD;}
 .item-card:active{transform:scale(.96);}
 .item-card.card-correct{border-color:#5BC886!important;background:#D4F5E0!important;}
 .item-card.card-wrong{border-color:#F07070!important;background:#FDE8E8!important;opacity:.6;}
 .item-card.card-locked{pointer-events:none;}
 .item-label{display:none;}
-.item-visual{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;}
-.item-visual svg{max-width:100%;height:auto;}
+.item-visual{display:flex;align-items:center;justify-content:center;width:100%;min-height:110px;}
+.item-visual svg{width:100%;height:auto;display:block;}
 
 
 .feedback{font-size:1rem;font-weight:700;text-align:center;padding:10px 0;min-height:42px;}
