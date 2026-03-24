@@ -347,9 +347,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
     <div class="mode-card">
       <div class="mode-card-top">
         <div class="mode-preview-wrap">
-          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
-            <line x1="24" y1="6" x2="24" y2="46" stroke="#C080D0" stroke-width="16" stroke-linecap="round"/>
-            <line x1="52" y1="6" x2="52" y2="46" stroke="#C080D0" stroke-width="4" stroke-linecap="round"/>
+          <svg viewBox="0 0 76 52" width="76" height="52">
+            <!-- 굵은 직육면체 (왼쪽) -->
+            <polygon points="12,8 18,4 32,4 26,8" fill="#C080D0" opacity=".6"/>
+            <rect x="12" y="8" width="14" height="36" rx="1" fill="#C080D0" opacity=".85"/>
+            <polygon points="26,8 32,4 32,40 26,44" fill="#C080D0" opacity=".5"/>
+            <!-- 얇은 직육면체 (오른쪽) -->
+            <polygon points="46,8 52,4 57,4 51,8" fill="#C080D0" opacity=".6"/>
+            <rect x="46" y="8" width="5" height="36" rx="1" fill="#C080D0" opacity=".85"/>
+            <polygon points="51,8 57,4 57,40 51,44" fill="#C080D0" opacity=".5"/>
           </svg>
         </div>
         <div class="mode-info">
