@@ -492,7 +492,7 @@ function shapeAt(shape, cx, cy, r, color) {
 }
 
 // level: 0=small, 1=medium, 2=large
-function drawItem(modeId, level, shape, color) {
+function drawItem(modeId, level, shape, color, lineStyle) {
   const col = color || '#6BADE8';
   switch(modeId) {
     case 'big': {
@@ -501,8 +501,38 @@ function drawItem(modeId, level, shape, color) {
     }
     case 'long': {
       const w = [14, 40, 66][level];
-      const x = (80 - w) / 2;
-      return `<svg viewBox="0 0 80 80" width="80" height="48"><rect x="${x}" y="34" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
+      const x0 = (80 - w) / 2;
+      const x1 = x0 + w;
+      const cy = 40;
+      const style = lineStyle || 'straight';
+      if (style === 'straight') {
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy - 6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
+      } else if (style === 'zigzag') {
+        const amp = 16;
+        const nSegs = Math.max(2, Math.round(w / 12));
+        const segW = w / nSegs;
+        let pts = `${x0},${cy}`;
+        for (let i = 1; i <= nSegs; i++) {
+          const x = x0 + i * segW;
+          const y = cy + (i % 2 === 1 ? -amp : amp);
+          pts += ` ${x},${y}`;
+        }
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      } else {
+        // wavy
+        const amp = 14;
+        const nCycles = Math.max(1, Math.round(w / 18));
+        const halfW = w / (nCycles * 2);
+        let d = `M${x0},${cy}`;
+        for (let i = 0; i < nCycles * 2; i++) {
+          const xStart = x0 + i * halfW;
+          const xEnd = xStart + halfW;
+          const xMid = (xStart + xEnd) / 2;
+          const yCtrl = cy + (i % 2 === 0 ? -amp : amp);
+          d += ` Q${xMid},${yCtrl} ${xEnd},${cy}`;
+        }
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><path d="${d}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/></svg>`;
+      }
     }
     case 'wide': {
       const w = [16, 42, 68][level];
@@ -568,7 +598,9 @@ function generateQuestion(modeId, type) {
   const qkey = type === '2way' ? (direction === 'max' ? 'q2max' : 'q2min') : (direction === 'max' ? 'q3max' : 'q3min');
   const shape = SHAPE_MODES.includes(modeId) ? MANY_SHAPES[Math.floor(Math.random() * MANY_SHAPES.length)] : null;
   const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
-  return { modeId, type, items, correct, question: m[qkey], shape, color };
+  const LINE_STYLES = ['straight', 'zigzag', 'wavy'];
+  const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
+  return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle };
 }
 
 function generateQuestions(modeId, type, count = 10) {
@@ -712,7 +744,7 @@ function loadQuestion() {
     const card = document.createElement('div');
     card.className = 'item-card';
     card.dataset.label = item.label;
-    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, q.shape, q.color)}</div>`;
+    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, q.shape, q.color, q.lineStyle)}</div>`;
     card.onclick = () => pickAnswer(item.label, q.correct, q);
     compareRow.appendChild(card);
   });
