@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>느린아이 비교하기</title>
+<title>느린아이 비교하기 기초</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -99,7 +99,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 
 /* Item cards */
 .compare-row{display:flex;gap:6px;justify-content:center;width:100%;margin-bottom:18px;}
-.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:14px 4px 10px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;}
+.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:14px 4px 10px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;overflow:hidden;}
 .item-card:hover{border-color:var(--blue);background:#EEF6FD;}
 .item-card:active{transform:scale(.96);}
 .item-card.card-correct{border-color:#5BC886!important;background:#D4F5E0!important;}
@@ -133,7 +133,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .splash-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
 .splash-overlay.fade-out{opacity:0;pointer-events:none;}
 .splash-logo{animation:splashFloat 2.4s ease-in-out infinite;margin-bottom:24px;}
-.splash-title{font-size:2rem;font-weight:900;letter-spacing:-.025em;margin-bottom:8px;}
+.splash-title{font-size:1.55rem;font-weight:900;letter-spacing:-.025em;margin-bottom:8px;}
 .splash-subtitle{color:#B8B0A8;font-size:.9375rem;font-weight:500;}
 @keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes popIn{0%{transform:scale(.8);opacity:.5}45%{transform:scale(1.15)}65%{transform:scale(.92)}80%{transform:scale(1.05)}100%{transform:scale(1)}}
@@ -169,7 +169,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
       <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
   </div>
-  <h1 class="splash-title"><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+  <h1 class="splash-title"><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초</span></h1>
   <p class="splash-subtitle">여러가지 비교를 해보아요!</p>
 </div>
 
@@ -200,7 +200,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
       <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
       <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초</span></h1>
     <p class="login-subtitle">여러가지 비교를 해보아요!</p>
   </div>
   <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
@@ -252,7 +252,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
       <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
       <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초</span></h1>
   </div>
 
   <div class="mode-grid">
@@ -312,10 +312,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-desc">두 가지의 넓이를 비교해요</div>
         </div>
       </div>
-      <div class="mode-mix-row">
-        <span class="mode-mix-label">모양 섞기</span>
-        <button id="mix-wide" class="toggle-track-sm" onclick="toggleMix('wide')"><span class="toggle-knob"></span></button>
-      </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('wide','2way')">2개 비교</button>
         <button class="mode-btn" onclick="startGame('wide','3way')">3개 비교</button>
@@ -335,10 +331,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-desc">두 가지의 굵기를 비교해요</div>
         </div>
       </div>
-      <div class="mode-mix-row">
-        <span class="mode-mix-label">모양 섞기</span>
-        <button id="mix-thick" class="toggle-track-sm" onclick="toggleMix('thick')"><span class="toggle-knob"></span></button>
-      </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('thick','2way')">2개 비교</button>
         <button class="mode-btn" onclick="startGame('thick','3way')">3개 비교</button>
@@ -349,10 +341,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
       <div class="mode-card-top">
         <div class="mode-preview-wrap">
           <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
-            <rect x="6" y="6" width="24" height="40" rx="2" fill="none" stroke="#8C7E6A" stroke-width="2"/>
-            <rect x="7" y="40" width="22" height="6" fill="#6BADE8" opacity=".55"/>
-            <rect x="44" y="6" width="24" height="40" rx="2" fill="none" stroke="#8C7E6A" stroke-width="2"/>
-            <rect x="45" y="12" width="22" height="34" fill="#6BADE8" opacity=".55"/>
+            <!-- 왼쪽: 깊다(물 많음) -->
+            <rect x="7" y="6" width="22" height="40" fill="white"/>
+            <rect x="7" y="11" width="22" height="35" fill="#6BADE8" opacity=".6"/>
+            <path d="M6,6 L6,46 L30,46 L30,6" stroke="#8C7E6A" stroke-width="2"/>
+            <!-- 오른쪽: 얕다(물 적음) -->
+            <rect x="45" y="6" width="22" height="40" fill="white"/>
+            <rect x="45" y="40" width="22" height="6" fill="#6BADE8" opacity=".6"/>
+            <path d="M44,6 L44,46 L68,46 L68,6" stroke="#8C7E6A" stroke-width="2"/>
           </svg>
         </div>
         <div class="mode-info">
@@ -497,10 +493,12 @@ const MODES = {
 };
 
 /* ══ SVG 그리기 ══ */
-const MANY_SHAPES = ['circle','square','triangle','star','heart','cylinder','cube','sphere'];
+const MANY_SHAPES = ['circle','square','triangle','star','heart'];
 const COLOR_PALETTE = ['#6BADE8','#F0A050','#5BC886','#C080D0','#E88070','#60B8D8','#D4A850','#8FB8E8'];
 const SHAPE_MODES = ['big','many'];
 const WIDE_THICK_SHAPES = ['cylinder','cube','sphere'];
+const WIDE_SHAPES = ['circle','square'];
+const THICK_SHAPES = ['cylinder','cube'];
 const MIX_MODES = ['big','many','wide','thick']; // 모양 섞기 지원 모드
 function shapeAt(shape, cx, cy, r, color, filled=true) {
   const sw = Math.max(2.5, r*0.17);
@@ -557,111 +555,149 @@ function shapeAt(shape, cx, cy, r, color, filled=true) {
 }
 
 // level: 0=small, 1=medium, 2=large
-function drawItem(modeId, level, shape, color, lineStyle, filled=true) {
+function drawItem(modeId, level, shape, color, lineStyle, filled=true, deepType='hole', itemW=null) {
   const col = color || '#6BADE8';
   switch(modeId) {
     case 'big': {
-      const r = [12, 22, 34][level];
+      const r = itemW !== null ? itemW : [7, 19, 36][level];
       return `<svg viewBox="0 0 80 80" width="72" height="72">${shapeAt(shape||'circle', 40, 40, r, col, filled)}</svg>`;
     }
     case 'long': {
-      const w = [26, 46, 68][level];
+      const w = itemW !== null ? itemW : [26, 48, 70][level];
       const x0 = (80 - w) / 2, cy = 40;
-      const style = lineStyle || 'straight';
-      if (style === 'straight') {
-        return filled
-          ? `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`
-          : `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="none" stroke="${col}" stroke-width="3"/></svg>`;
-      } else if (style === 'zigzag') {
-        const amp=6, nSegs=Math.max(2,Math.round(w/12)), segW=w/nSegs;
-        let pts=`${x0},${cy}`;
-        for(let i=1;i<=nSegs;i++) pts+=` ${x0+i*segW},${cy+(i%2===1?-amp:amp)}`;
-        return `<svg viewBox="0 0 80 80" width="80" height="72"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      } else if (style === 'wavy') {
-        const amp=14, nCycles=Math.max(1,Math.round(w/18)), halfW=w/(nCycles*2);
-        let d=`M${x0},${cy}`;
-        for(let i=0;i<nCycles*2;i++){const xs=x0+i*halfW,xe=xs+halfW;d+=` Q${(xs+xe)/2},${cy+(i%2===0?-amp:amp)} ${xe},${cy}`;}
-        return `<svg viewBox="0 0 80 80" width="80" height="72"><path d="${d}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/></svg>`;
+      const style = lineStyle || 'line';
+      if (style === 'line') {
+        // 직선
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><line x1="${x0}" y1="${cy}" x2="${x0+w}" y2="${cy}" stroke="${col}" stroke-width="5" stroke-linecap="round"/></svg>`;
+      } else if (style === 'rect') {
+        // 직사각형
+        const rh=16;
+        return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-rh/2}" width="${w}" height="${rh}" rx="2" fill="${col}" opacity=".85"/></svg>`;
       } else if (style === 'cylinder') {
-        const ry=9, bodyW=Math.max(1,w-ry*2);
+        // 속이 찬 원기둥 (side view)
+        const ry=10, ex=4, bodyW=Math.max(1,w-ex*2);
         return `<svg viewBox="0 0 80 80" width="80" height="72">
-          <rect x="${x0+ry}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="${col}" opacity=".85"/>
-          <circle cx="${x0+ry+bodyW}" cy="${cy}" r="${ry}" fill="${col}" opacity=".7"/>
-          <circle cx="${x0+ry}" cy="${cy}" r="${ry}" fill="${col}" opacity=".95"/>
+          <ellipse cx="${x0+ex}" cy="${cy}" rx="${ex}" ry="${ry}" fill="${col}" opacity=".7"/>
+          <rect x="${x0+ex}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="${col}" opacity=".85"/>
+          <ellipse cx="${x0+ex+bodyW}" cy="${cy}" rx="${ex}" ry="${ry}" fill="${col}" opacity=".9"/>
         </svg>`;
       } else {
-        // cube (항상 채움)
-        const bh=16, ox=5, oy=5;
-        const lx0=(80-(w+ox))/2, y0=40-(bh+oy)/2+oy;
+        // 속이 빈 원기둥 (side view, outline only)
+        const ry=10, ex=4, bodyW=Math.max(1,w-ex*2);
         return `<svg viewBox="0 0 80 80" width="80" height="72">
-          <polygon points="${lx0},${y0} ${lx0+ox},${y0-oy} ${lx0+w+ox},${y0-oy} ${lx0+w},${y0}" fill="${col}" opacity=".62"/>
-          <rect x="${lx0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
-          <polygon points="${lx0+w},${y0} ${lx0+w+ox},${y0-oy} ${lx0+w+ox},${y0-oy+bh} ${lx0+w},${y0+bh}" fill="${col}" opacity=".5"/>
+          <ellipse cx="${x0+ex}" cy="${cy}" rx="${ex}" ry="${ry}" fill="none" stroke="${col}" stroke-width="2" opacity=".4"/>
+          <line x1="${x0+ex}" y1="${cy-ry}" x2="${x0+ex+bodyW}" y2="${cy-ry}" stroke="${col}" stroke-width="2"/>
+          <line x1="${x0+ex}" y1="${cy+ry}" x2="${x0+ex+bodyW}" y2="${cy+ry}" stroke="${col}" stroke-width="2"/>
+          <ellipse cx="${x0+ex+bodyW}" cy="${cy}" rx="${ex}" ry="${ry}" fill="none" stroke="${col}" stroke-width="2"/>
         </svg>`;
       }
     }
     case 'wide': {
+      // 2D 도형: 수평 방향으로 늘어나서 넓다/좁다 표현
+      const FLAT_2D_WIDE = ['circle','square','triangle','star','heart'];
+      if (FLAT_2D_WIDE.includes(shape)) {
+        const ww=itemW!==null?itemW:[8,32,70][level], hy=13, cx=40, cy=40;
+        const fa=filled?`fill="${col}" opacity=".85"`:`fill="none" stroke="${col}" stroke-width="2.5" opacity=".9"`;
+        let el='';
+        switch(shape){
+          case 'circle': el=`<ellipse cx="${cx}" cy="${cy}" rx="${ww/2}" ry="${hy}" ${fa}/>`; break;
+          case 'square': el=`<rect x="${cx-ww/2}" y="${cy-hy}" width="${ww}" height="${hy*2}" rx="2" ${fa}/>`; break;
+          case 'triangle': el=`<polygon points="${cx},${cy-hy} ${cx-ww/2},${cy+hy} ${cx+ww/2},${cy+hy}" ${fa} stroke-linejoin="round"/>`; break;
+          case 'star': { let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rx_=i%2===0?ww/2:ww/5,ry_=i%2===0?hy:hy*.4; pts+=`${cx+Math.cos(a)*rx_},${cy+Math.sin(a)*ry_} `;} el=`<polygon points="${pts.trim()}" ${fa} stroke-linejoin="round"/>`; break; }
+          case 'heart': { const rx_=ww/2,ry_=hy; const d=`M${cx},${cy+ry_} C${cx-rx_*.4},${cy+ry_*.5} ${cx-rx_},${cy+ry_*.05} ${cx-rx_},${cy-ry_*.25} C${cx-rx_},${cy-ry_*.78} ${cx-rx_*.35},${cy-ry_*.95} ${cx},${cy-ry_*.48} C${cx+rx_*.35},${cy-ry_*.95} ${cx+rx_},${cy-ry_*.78} ${cx+rx_},${cy-ry_*.25} C${cx+rx_},${cy+ry_*.05} ${cx+rx_*.4},${cy+ry_*.5} ${cx},${cy+ry_}Z`; el=`<path d="${d}" ${fa} stroke-linejoin="round"/>`; break; }
+        }
+        return `<svg viewBox="0 0 80 80" width="80" height="64">${el}</svg>`;
+      }
       if (shape === 'cylinder') {
-        const w=[22,46,70][level], h=22, r=h/2, bodyW=Math.max(0,w-h), x0=(80-w)/2;
+        const w=[22,44,74][level], h=22, r=h/2, bodyW=Math.max(0,w-h), x0=(80-w)/2;
         return `<svg viewBox="0 0 80 80" width="80" height="64">
           <rect x="${x0+r}" y="${40-r}" width="${bodyW}" height="${h}" fill="${col}" opacity=".85"/>
           <circle cx="${x0+r}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
           <circle cx="${x0+r+bodyW}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
         </svg>`;
       } else if (shape === 'cube') {
-        const w=[18,42,66][level], bh=22, ox=8, oy=6, x0=(80-w-ox)/2, y0=32;
+        const w=[10,36,68][level], bh=22, ox=8, oy=6, x0=(80-w-ox)/2, y0=32;
         return `<svg viewBox="0 0 80 80" width="80" height="64">
           <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".6"/>
           <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
           <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
         </svg>`;
       } else if (shape === 'sphere') {
-        const r=[13,23,35][level];
+        const r=[8,20,36][level];
         return `<svg viewBox="0 0 80 80" width="80" height="64">${shapeAt('sphere', 40, 40, r, col, true)}</svg>`;
       } else {
-        const w=[16,42,68][level], h=26, x=(80-w)/2, y=(80-h)/2;
+        const w=itemW!==null?itemW:[8,38,70][level], h=26, x=(80-w)/2, y=(80-h)/2;
         return filled
           ? `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${col}" opacity=".85"/></svg>`
           : `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="none" stroke="${col}" stroke-width="3" opacity=".9"/></svg>`;
       }
     }
     case 'thick': {
+      // 2D 도형은 테두리 굵기(stroke-width)로 굵다/얇다 표현
+      const FLAT_SHAPES_2D = ['circle','square','triangle','star','heart'];
+      if (FLAT_SHAPES_2D.includes(shape)) {
+        const sw2d = [2, 7, 26][level], r2d = 26;
+        let el = '';
+        switch(shape) {
+          case 'circle': el=`<circle cx="40" cy="40" r="${r2d}" fill="none" stroke="${col}" stroke-width="${sw2d}" opacity=".9"/>`; break;
+          case 'square': { const s=r2d*1.75; el=`<rect x="${40-s/2}" y="${40-s/2}" width="${s}" height="${s}" rx="2" fill="none" stroke="${col}" stroke-width="${sw2d}" opacity=".9"/>`; break; }
+          case 'triangle': { const h=r2d*1.9; el=`<polygon points="40,${40-h*.6} ${40-h*.55},${40+h*.4} ${40+h*.55},${40+h*.4}" fill="none" stroke="${col}" stroke-width="${sw2d}" stroke-linejoin="round" opacity=".9"/>`; break; }
+          case 'star': { let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rad=i%2===0?r2d:r2d*.4; pts+=`${40+Math.cos(a)*rad},${40+Math.sin(a)*rad} `;} el=`<polygon points="${pts.trim()}" fill="none" stroke="${col}" stroke-width="${Math.max(2,sw2d*.8)}" stroke-linejoin="round" opacity=".9"/>`; break; }
+          case 'heart': { const d=`M40,${40+r2d} C${40-r2d*.4},${40+r2d*.5} ${40-r2d},${40+r2d*.05} ${40-r2d},${40-r2d*.25} C${40-r2d},${40-r2d*.78} ${40-r2d*.35},${40-r2d*.95} 40,${40-r2d*.48} C${40+r2d*.35},${40-r2d*.95} ${40+r2d},${40-r2d*.78} ${40+r2d},${40-r2d*.25} C${40+r2d},${40+r2d*.05} ${40+r2d*.4},${40+r2d*.5} 40,${40+r2d}Z`; el=`<path d="${d}" fill="none" stroke="${col}" stroke-width="${sw2d}" stroke-linejoin="round" opacity=".9"/>`; break; }
+        }
+        return `<svg viewBox="0 0 80 80" width="64" height="72">${el}</svg>`;
+      }
       if (shape === 'cylinder') {
-        const d=[8,18,30][level], r=d/2, ry=r*.32, h=50, top=15, bot=top+h-ry;
+        const d=itemW!==null?itemW:[5,15,34][level], r=d/2, ry=r*.32, h=50, top=15, bot=top+h-ry;
         return `<svg viewBox="0 0 80 80" width="64" height="72">
           <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="${col}" opacity=".65"/>
           <rect x="${40-r}" y="${top+ry}" width="${d}" height="${h-ry*2}" fill="${col}" opacity=".85"/>
           <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
         </svg>`;
       } else if (shape === 'cube') {
-        const sw=[8,18,30][level], h=50, ox=6, oy=5, x0=40-(sw+ox)/2, y0=18;
+        const sw=itemW!==null?itemW:[5,15,34][level], h=50, ox=6, oy=5, x0=40-(sw+ox)/2, y0=18;
         return `<svg viewBox="0 0 80 80" width="64" height="72">
           <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="${col}" opacity=".6"/>
           <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="${col}" opacity=".85"/>
           <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="${col}" opacity=".5"/>
         </svg>`;
       } else if (shape === 'sphere') {
-        const r=[10,19,30][level];
+        const r=[6,16,32][level];
         return `<svg viewBox="0 0 80 80" width="64" height="72">${shapeAt('sphere', 40, 40, r, col, true)}</svg>`;
       } else {
-        const sw=[4,11,22][level];
+        const sw=[2,8,28][level];
         return `<svg viewBox="0 0 80 80" width="64" height="72"><line x1="40" y1="8" x2="40" y2="72" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
       }
     }
     case 'deep': {
-      // 깊다 = 빈 공간(구멍 깊이)이 크다 → level 높을수록 채워진 부분(흙)이 적다
-      const fillPct = [0.85, 0.50, 0.15][level];
       const ch = 56, cTop = 8;
-      const fh = Math.round(ch * fillPct);
-      const fy = cTop + ch - fh;
-      return `<svg viewBox="0 0 80 80" width="68" height="72">
-        <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
-        <rect x="21" y="${fy}" width="38" height="${fh}" fill="${col}" opacity=".55"/>
-        <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
-      </svg>`;
+      const cid = `cd${_svgIdCtr++}`;
+      if (deepType === 'cup') {
+        // 물컵: 깊을수록 물 높이가 높다
+        const fillPct = itemW !== null ? itemW : [0.07, 0.50, 0.93][level];
+        const fh = Math.round(ch * fillPct);
+        const fy = cTop + ch - fh;
+        return `<svg viewBox="0 0 80 80" width="68" height="72">
+          <defs><clipPath id="${cid}"><rect x="20" y="${cTop}" width="40" height="${ch}"/></clipPath></defs>
+          <rect x="20" y="${cTop}" width="40" height="${ch}" fill="white"/>
+          <rect x="20" y="${fy}" width="40" height="${fh}" fill="#5BA8D8" opacity=".6" clip-path="url(#${cid})"/>
+          <path d="M20,${cTop} L20,${cTop+ch} L60,${cTop+ch} L60,${cTop}" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
+        </svg>`;
+      } else {
+        // 땅(구멍): 깊을수록 빈 공간이 크다
+        const fillPct = [0.93, 0.50, 0.07][level];
+        const fh = Math.round(ch * fillPct);
+        const fy = cTop + ch - fh;
+        return `<svg viewBox="0 0 80 80" width="68" height="72">
+          <defs><clipPath id="${cid}"><rect x="20" y="${cTop}" width="40" height="${ch}" rx="3"/></clipPath></defs>
+          <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="white" stroke="#7A6650" stroke-width="2.5"/>
+          <rect x="20" y="${fy}" width="40" height="${fh}" fill="#A07850" opacity=".75" clip-path="url(#${cid})"/>
+          <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#7A6650" stroke-width="2.5"/>
+        </svg>`;
+      }
     }
     case 'many': {
-      const count = [3, 6, 9][level];
+      const count = itemW !== null ? itemW : [2, 5, 9][level];
       const cols = 3, r = 7, gap = 20;
       const rows = Math.ceil(count / cols);
       const gw = (Math.min(count, cols) - 1) * gap;
@@ -679,7 +715,8 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true) {
 }
 
 /* ══ 문제 생성 ══ */
-const PAIRS_2WAY = [[0,2],[0,1],[1,2]];
+const PAIRS_2WAY = [[0,2]];
+let _svgIdCtr = 0;
 
 function generateQuestion(modeId, type, mixedShapes=false) {
   const n = type === '2way' ? 2 : 3;
@@ -702,9 +739,10 @@ function generateQuestion(modeId, type, mixedShapes=false) {
   const m = MODES[modeId];
   const qkey = type === '2way' ? (direction === 'max' ? 'q2max' : 'q2min') : (direction === 'max' ? 'q3max' : 'q3min');
   const shapePool = SHAPE_MODES.includes(modeId) ? MANY_SHAPES
-    : (modeId === 'wide' || modeId === 'thick') ? WIDE_THICK_SHAPES : null;
+    : modeId === 'thick' ? THICK_SHAPES
+    : modeId === 'wide' ? WIDE_SHAPES : null;
   const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
-  const LINE_STYLES = ['straight', 'zigzag', 'wavy', 'cylinder', 'cube'];
+  const LINE_STYLES = ['line','rect'];
   const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
   const filled = Math.random() < 0.5;
 
@@ -717,8 +755,41 @@ function generateQuestion(modeId, type, mixedShapes=false) {
   } else if (shapePool) {
     shape = shapePool[Math.floor(Math.random() * shapePool.length)];
   }
+  // 레벨별 범위 안에서 랜덤 값 할당해 차이를 다양하게
+  const extraRanges = {
+    long:  [[24,34],[40,56],[60,74]],
+    big:   [[6,12],[15,24],[28,38]],
+    wide:  [[6,16],[26,44],[56,72]],
+    thick: [[4,8],[12,20],[28,40]],
+    many:  [[2,4],[5,7],[8,12]],
+  };
+  if (extraRanges[modeId]) {
+    items.forEach(item => {
+      const [mn, mx] = extraRanges[modeId][item.level];
+      item.longW = Math.round(mn + Math.random() * (mx - mn));
+    });
+  }
+  // deep 모드: 차이가 다양하도록 fillPct를 자유 생성 (최소 0.20, 최대 0.55 차이)
+  if (modeId === 'deep') {
+    const rnd = () => Math.random();
+    if (n === 2) {
+      const lo = 0.05 + rnd() * 0.30;          // 0.05 ~ 0.35
+      const diff = 0.20 + rnd() * 0.35;         // 0.20 ~ 0.55
+      const hi = Math.min(0.95, lo + diff);
+      items.forEach(item => { item.longW = item.level === 0 ? lo : hi; });
+    } else {
+      const lo  = 0.05 + rnd() * 0.15;          // 0.05 ~ 0.20
+      const gap = 0.18 + rnd() * 0.15;          // 0.18 ~ 0.33 per step
+      const mid = Math.min(0.75, lo + gap);
+      const hi  = Math.min(0.95, mid + gap);
+      items.forEach(item => {
+        item.longW = item.level === 0 ? lo : item.level === 1 ? mid : hi;
+      });
+    }
+  }
 
-  return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle, filled };
+  const deepType = modeId === 'deep' ? 'cup' : null;
+  return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle, filled, deepType };
 }
 
 function generateQuestions(modeId, type, count=10, mixedShapes=false) {
@@ -868,7 +939,7 @@ function loadQuestion() {
     const card = document.createElement('div');
     card.className = 'item-card';
     card.dataset.label = item.label;
-    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, item.shape||q.shape, q.color, q.lineStyle, q.filled)}</div>`;
+    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, item.shape||q.shape, q.color, q.lineStyle, q.filled, q.deepType, item.longW||null)}</div>`;
     card.onclick = () => pickAnswer(item.label, q.correct, q);
     compareRow.appendChild(card);
   });
