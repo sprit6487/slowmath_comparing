@@ -715,14 +715,20 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true, deepType=
 }
 
 /* ══ 문제 생성 ══ */
-const PAIRS_2WAY = [[0,2]];
+// 모드별 2way 페어: big/many는 [0,1],[1,2],[0,2] 골고루, 나머지는 [0,2] 고정
+const PAIRS_2WAY_BY_MODE = {
+  big:  [[0,1],[1,2],[0,2],[0,2]],  // 25% 작↔중, 25% 중↔대, 50% 작↔대
+  many: [[0,1],[1,2],[0,2],[0,2]],
+};
+const PAIRS_2WAY_DEFAULT = [[0,2]];
 let _svgIdCtr = 0;
 
 function generateQuestion(modeId, type, mixedShapes=false) {
   const n = type === '2way' ? 2 : 3;
   let levels;
   if (n === 2) {
-    levels = [...PAIRS_2WAY[Math.floor(Math.random() * PAIRS_2WAY.length)]];
+    const pairPool = PAIRS_2WAY_BY_MODE[modeId] || PAIRS_2WAY_DEFAULT;
+    levels = [...pairPool[Math.floor(Math.random() * pairPool.length)]];
   } else {
     levels = [0, 1, 2];
   }
