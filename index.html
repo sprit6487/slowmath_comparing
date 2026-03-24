@@ -508,7 +508,7 @@ function drawItem(modeId, level, shape, color, lineStyle) {
       if (style === 'straight') {
         return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy - 6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
       } else if (style === 'zigzag') {
-        const amp = 16;
+        const amp = 9;
         const nSegs = Math.max(2, Math.round(w / 12));
         const segW = w / nSegs;
         let pts = `${x0},${cy}`;
