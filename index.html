@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>느린아이 비교하기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --warm-700:#4A4035; --warm-800:#2E261D;
+  --warm-400:#B8AD9E; --warm-500:#8C8070; --warm-600:#6B5F50;
+  --border:#E8E2DA; --border-light:#F0ECE6;
+  --blue:#6BADE8; --orange:#F0A050; --green:#5BC886; --red:#F07070;
+  --bg:#F5F1EB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;user-select:none;-webkit-tap-highlight-color:transparent;color:var(--warm-700);}
+.hidden{display:none!important;}
+.app{width:100%;max-width:480px;min-height:100dvh;background:#fff;padding:24px 20px;padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;}
+@media(min-width:768px){body{align-items:center;padding:32px;}.app{max-width:560px;min-height:auto;border-radius:32px;box-shadow:0 8px 48px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);padding:44px 40px;}}
+
+/* ── Login ── */
+.login-view{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:100dvh;padding:40px 20px;width:100%;}
+.login-logo-area{text-align:center;margin-bottom:48px;}
+.login-logo-area h1{font-size:1.875rem;font-weight:900;letter-spacing:-.025em;margin-top:8px;}
+.login-subtitle{color:var(--warm-400);font-size:.9375rem;margin-top:4px;}
+@keyframes floatBubble{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.login-trial{position:relative;background:#FFF8F0;border:1.5px solid #EDD080;border-radius:14px;padding:9px 16px;font-size:.78rem;color:#7B6545;font-weight:600;text-align:center;margin-bottom:24px;line-height:1.4;box-shadow:0 4px 14px rgba(220,160,50,.18);animation:floatBubble 2.8s ease-in-out infinite;align-self:center;}
+.login-trial::before{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top:8px solid #EDD080;border-bottom:0;}
+.login-trial::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top:7px solid #FFF8F0;border-bottom:0;z-index:1;}
+.login-buttons{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;}
+.login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;border-radius:12px;border:none;font-size:.9375rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .1s;}
+.login-btn:active{transform:scale(.97);}
+.login-btn svg{flex-shrink:0;}
+.login-btn.kakao{background:#FEE500;color:#191919;}
+.login-btn.naver{background:#03C75A;color:#fff;}
+.login-btn.google{background:#fff;color:#444;border:1.5px solid #DADCE0;}
+.login-btn.facebook{background:#1877F2;color:#fff;}
+
+/* ── Start View ── */
+#start-view{width:100%;display:flex;flex-direction:column;align-items:center;}
+.brand{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;position:relative;width:100%;}
+.brand h1{font-size:1.5rem;font-weight:900;letter-spacing:-.025em;margin-top:8px;}
+.share-btn{position:absolute;top:0;right:0;background:#fff;border:2px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--warm-500);}
+
+/* Mode Cards */
+.mode-grid{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.mode-card{background:#fff;border:2px solid var(--border);border-radius:20px;padding:14px 16px 12px;width:100%;}
+.mode-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.mode-preview-wrap{width:76px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.mode-info{flex:1;text-align:left;}
+.mode-title{font-size:1rem;font-weight:700;color:var(--warm-700);margin-bottom:2px;}
+.mode-desc{font-size:.72rem;color:var(--warm-400);}
+.mode-btns{display:flex;gap:8px;}
+.mode-btn{flex:1;padding:10px 0;border:2px solid var(--border);border-radius:10px;background:#fff;font-family:inherit;font-size:.85rem;font-weight:700;color:var(--warm-600);cursor:pointer;transition:all .12s;text-align:center;}
+.mode-btn:hover,.mode-btn:active{background:#EEF6FD;border-color:var(--blue);color:var(--blue);}
+
+/* ── Settings ── */
+.settings-section{width:100%;border-top:1.5px solid var(--border-light);padding-top:16px;margin-top:4px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.setting-label{font-size:.875rem;font-weight:600;color:var(--warm-700);}
+.setting-desc{font-size:.75rem;color:var(--warm-400);margin-top:2px;}
+.toggle-track{width:48px;height:28px;border-radius:99px;position:relative;background:#E0DAD0;border:none;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle-track.on{background:#5BC886;}
+.toggle-knob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .2s;}
+.toggle-track.on .toggle-knob{transform:translateX(20px);}
+.impulse-mode-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.impulse-mode-btn{display:flex;flex-direction:column;align-items:center;padding:10px 8px;border-radius:14px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;font-family:inherit;}
+.impulse-mode-btn.selected{border-color:#C4AA82;background:#FAF5EE;}
+.impulse-mode-icon{font-size:1.2rem;margin-bottom:2px;}
+.impulse-mode-label{font-size:.8rem;font-weight:700;color:var(--warm-700);}
+.impulse-mode-desc{font-size:.65rem;color:var(--warm-400);margin-top:1px;}
+.imp-sec-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+.imp-sec{flex:0 0 calc((100% - 16px)/5);padding:8px 0;font-size:.7rem;font-weight:600;border-radius:10px;border:2px solid var(--border);background:#fff;color:#8C8070;cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;}
+.imp-sec.active{border-color:#C4AA82;background:#FAF5EE;color:#7B6545;}
+#impulse-details{display:none;}
+.logout-btn{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;font-size:.75rem;font-weight:600;color:var(--warm-400);cursor:pointer;font-family:inherit;margin-top:20px;}
+.logout-btn:hover{background:var(--bg);}
+
+/* ── Play View ── */
+#play-view{width:100%;display:flex;flex-direction:column;align-items:center;}
+.play-header{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:14px;}
+.btn-home{width:36px;height:36px;border-radius:10px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--warm-500);flex-shrink:0;padding:0;}
+.play-middle{flex:1;display:flex;flex-direction:column;gap:4px;}
+.play-progress-label{font-size:.8rem;font-weight:600;color:var(--warm-500);}
+.play-progress-bar{width:100%;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;}
+.play-progress-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .3s;}
+.play-score{font-size:.85rem;font-weight:700;color:var(--green);flex-shrink:0;}
+.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px 16px 16px;width:100%;display:flex;flex-direction:column;align-items:center;}
+.question-prompt{font-size:1.3rem;font-weight:900;color:var(--warm-700);text-align:center;margin-bottom:20px;line-height:1.3;}
+
+/* Item cards */
+.compare-row{display:flex;gap:8px;justify-content:center;width:100%;margin-bottom:18px;}
+.item-card{flex:1;border:2px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;background:#FDFCFA;min-width:0;}
+.item-label{font-size:.9rem;font-weight:900;color:var(--warm-500);margin-bottom:6px;}
+.item-visual{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;}
+.item-visual svg{max-width:100%;height:auto;}
+
+/* Answer buttons */
+.answer-row{display:flex;gap:10px;justify-content:center;width:100%;margin-bottom:4px;}
+.answer-btn{flex:1;padding:16px 0;border:2.5px solid var(--border);border-radius:14px;background:#fff;font-family:inherit;font-size:1.2rem;font-weight:900;color:var(--warm-700);cursor:pointer;transition:transform .1s,border-color .15s,background .15s;}
+.answer-btn:active:not(:disabled){transform:scale(.95);}
+.answer-btn:disabled{pointer-events:none;}
+.answer-btn.correct{background:#D4F5E0!important;border-color:#5BC886!important;color:#1A7A3A!important;animation:popIn .35s ease;}
+.answer-btn.wrong{background:#FDE8E8!important;border-color:#F07070!important;color:#B91C1C!important;opacity:.5;animation:shake .4s ease;}
+
+.feedback{font-size:1rem;font-weight:700;text-align:center;padding:10px 0;min-height:42px;}
+.feedback.correct{color:#5BC886;}
+.feedback.wrong{color:#F07070;}
+
+.btn-next-q{display:block;width:100%;max-width:360px;margin:8px auto 0;padding:14px 0;border-radius:16px;border:none;background:#4A4035;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(74,64,53,.15);transition:background .15s,transform .1s;}
+.btn-next-q:active{transform:scale(.98);background:#2E261D;}
+
+.reveal-btn{display:block;width:100%;max-width:320px;margin:8px auto;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+.delay-countdown{text-align:center;font-size:1.5rem;font-weight:900;color:#C4AA82;padding:14px 0;animation:pulse-count 1s ease infinite;}
+
+/* Result View */
+#result-view{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px 0;}
+.big-score{font-size:4rem;font-weight:900;color:#5BC886;line-height:1;}
+.result-label{font-size:1.1rem;font-weight:600;color:#8C8070;margin-top:8px;}
+.result-detail{font-size:.9rem;color:#B8AD9E;margin-top:4px;}
+.retry-btn{margin-top:32px;padding:14px 48px;border-radius:16px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:1rem;font-weight:700;color:var(--warm-700);cursor:pointer;}
+.retry-btn:active{transform:scale(.95);}
+
+/* Splash */
+.splash-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
+.splash-overlay.fade-out{opacity:0;pointer-events:none;}
+.splash-logo{animation:splashFloat 2.4s ease-in-out infinite;margin-bottom:24px;}
+.splash-title{font-size:2rem;font-weight:900;letter-spacing:-.025em;margin-bottom:8px;}
+.splash-subtitle{color:#B8B0A8;font-size:.9375rem;font-weight:500;}
+@keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes popIn{0%{transform:scale(.8);opacity:.5}45%{transform:scale(1.15)}65%{transform:scale(.92)}80%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pulse-count{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash" class="splash-overlay">
+  <div class="splash-logo">
+    <svg viewBox="0 0 120 100" width="140" height="117" fill="none">
+      <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+      <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+      <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+      <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+      <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+      <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+      <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+      <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+      <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+      <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+      <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+      <circle cx="101" cy="33" r="1" fill="white"/>
+      <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+      <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1 class="splash-title"><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+  <p class="splash-subtitle">크고 작음을 비교해 보세요!</p>
+</div>
+
+<div class="app">
+
+<!-- ══ 로그인 ══ -->
+<div id="login-view" class="login-view">
+  <div class="login-logo-area">
+    <svg viewBox="0 0 120 100" width="120" height="100" fill="none">
+      <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+      <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+      <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+      <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+      <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+      <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+      <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+      <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+      <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+      <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+      <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+      <circle cx="101" cy="33" r="1" fill="white"/>
+      <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+      <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+    <p class="login-subtitle">크고 작음을 비교해 보세요!</p>
+  </div>
+  <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+  <div class="login-buttons">
+    <button class="login-btn kakao" onclick="socialLogin('kakao')">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+      카카오로 시작하기
+    </button>
+    <button class="login-btn naver" onclick="socialLogin('naver')">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+      네이버로 시작하기
+    </button>
+    <button class="login-btn google" onclick="socialLogin('google')">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+      Google로 시작하기
+    </button>
+    <button class="login-btn facebook" onclick="socialLogin('facebook')">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+      Facebook으로 시작하기
+    </button>
+  </div>
+</div>
+
+<!-- ══ 시작 화면 ══ -->
+<div id="start-view" class="hidden">
+  <div class="brand">
+    <button class="share-btn" onclick="shareApp()" title="공유하기">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+    </button>
+    <svg viewBox="0 0 120 100" width="90" height="75" fill="none">
+      <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+      <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+      <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+      <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+      <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+      <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+      <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+      <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+      <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+      <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+      <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+      <circle cx="101" cy="33" r="1" fill="white"/>
+      <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+      <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기</span></h1>
+  </div>
+
+  <div class="mode-grid">
+    <!-- 크다 작다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <circle cx="20" cy="26" r="11" fill="#6BADE8" opacity=".8"/>
+            <circle cx="55" cy="26" r="21" fill="#6BADE8" opacity=".8"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">크다 작다</div>
+          <div class="mode-desc">두 가지의 크기를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('big','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('big','3way')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 길다 짧다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <rect x="4" y="18" width="22" height="8" rx="4" fill="#F0A050"/>
+            <rect x="4" y="32" width="62" height="8" rx="4" fill="#F0A050"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">길다 짧다</div>
+          <div class="mode-desc">두 가지의 길이를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('long','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('long','3way')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 넓다 좁다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <rect x="28" y="8" width="14" height="18" rx="3" fill="#5BC886" opacity=".85"/>
+            <rect x="4" y="30" width="62" height="18" rx="3" fill="#5BC886" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">넓다 좁다</div>
+          <div class="mode-desc">두 가지의 넓이를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('wide','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('wide','3way')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 굵다 얇다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <line x1="24" y1="6" x2="24" y2="46" stroke="#C080D0" stroke-width="4" stroke-linecap="round"/>
+            <line x1="52" y1="6" x2="52" y2="46" stroke="#C080D0" stroke-width="16" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">굵다 얇다</div>
+          <div class="mode-desc">두 가지의 굵기를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('thick','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('thick','3way')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 깊다 얕다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <rect x="6" y="6" width="24" height="40" rx="2" fill="none" stroke="#8C7E6A" stroke-width="2"/>
+            <rect x="7" y="40" width="22" height="6" fill="#6BADE8" opacity=".55"/>
+            <rect x="44" y="6" width="24" height="40" rx="2" fill="none" stroke="#8C7E6A" stroke-width="2"/>
+            <rect x="45" y="12" width="22" height="34" fill="#6BADE8" opacity=".55"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">깊다 얕다</div>
+          <div class="mode-desc">두 가지의 깊이를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('deep','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('deep','3way')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 많다 적다 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
+            <circle cx="12" cy="26" r="6" fill="#E88070" opacity=".85"/>
+            <circle cx="26" cy="26" r="6" fill="#E88070" opacity=".85"/>
+            <line x1="38" y1="4" x2="38" y2="48" stroke="#E8E2DA" stroke-width="1.5"/>
+            <circle cx="48" cy="16" r="5" fill="#E88070" opacity=".85"/>
+            <circle cx="60" cy="16" r="5" fill="#E88070" opacity=".85"/>
+            <circle cx="48" cy="28" r="5" fill="#E88070" opacity=".85"/>
+            <circle cx="60" cy="28" r="5" fill="#E88070" opacity=".85"/>
+            <circle cx="48" cy="40" r="5" fill="#E88070" opacity=".85"/>
+            <circle cx="60" cy="40" r="5" fill="#E88070" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">많다 적다</div>
+          <div class="mode-desc">두 가지의 수량을 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('many','2way')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('many','3way')">3개 비교</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설정 -->
+  <div class="settings-section">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">음성</div>
+        <div class="setting-desc">정답/오답 음성 안내</div>
+      </div>
+      <button id="tts-toggle" onclick="toggleTTS()" class="toggle-track on"><span class="toggle-knob"></span></button>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">충동방지</div>
+        <div class="setting-desc">생각할 시간을 줘요</div>
+      </div>
+      <button id="impulse-toggle" onclick="toggleImpulse()" class="toggle-track on"><span class="toggle-knob"></span></button>
+    </div>
+    <div id="impulse-details">
+      <div class="impulse-mode-options">
+        <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+          <span class="impulse-mode-icon">👀</span>
+          <span class="impulse-mode-label">보기 확인</span>
+          <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+        </button>
+        <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+          <span class="impulse-mode-icon">🔒</span>
+          <span class="impulse-mode-label">선택 잠금</span>
+          <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+        </button>
+      </div>
+      <div class="imp-sec-row" id="impulse-delay-row" style="display:none;">
+        <button onclick="setImpulseDelay(1)" class="imp-sec">1초</button>
+        <button onclick="setImpulseDelay(2)" class="imp-sec">2초</button>
+        <button onclick="setImpulseDelay(3)" class="imp-sec">3초</button>
+        <button onclick="setImpulseDelay(4)" class="imp-sec">4초</button>
+        <button onclick="setImpulseDelay(5)" class="imp-sec active">5초</button>
+        <button onclick="setImpulseDelay(6)" class="imp-sec">6초</button>
+        <button onclick="setImpulseDelay(7)" class="imp-sec">7초</button>
+        <button onclick="setImpulseDelay(8)" class="imp-sec">8초</button>
+        <button onclick="setImpulseDelay(9)" class="imp-sec">9초</button>
+        <button onclick="setImpulseDelay(10)" class="imp-sec">10초</button>
+      </div>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="logout()">로그아웃</button>
+</div>
+
+<!-- ══ 게임 화면 ══ -->
+<div id="play-view" class="hidden">
+  <div class="play-header">
+    <button onclick="goHome()" class="btn-home" title="홈">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+    </button>
+    <div class="play-middle">
+      <div class="play-progress-label" id="q-label">1 / 10</div>
+      <div class="play-progress-bar"><div class="play-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="play-score" id="play-score">0점</div>
+  </div>
+  <div class="game-container">
+    <div class="question-prompt" id="question-prompt">어느 것이 더 크나요?</div>
+    <div class="compare-row" id="compare-row"></div>
+    <div class="answer-row" id="answer-row"></div>
+    <div class="feedback" id="feedback"></div>
+    <div id="impulse-area"></div>
+    <button class="btn-next-q hidden" id="next-q-btn" onclick="onNextQ()">다음 문제 →</button>
+  </div>
+</div>
+
+<!-- ══ 결과 화면 ══ -->
+<div id="result-view" class="hidden">
+  <svg viewBox="0 0 120 100" width="100" height="84" fill="none">
+    <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+    <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+    <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+    <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+    <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+    <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+    <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+    <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+    <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+    <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+    <circle cx="101" cy="33" r="1" fill="white"/>
+    <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+    <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <div class="big-score" id="final-score">0</div>
+  <div class="result-label">맞힌 문제</div>
+  <div class="result-detail" id="result-detail"></div>
+  <button class="retry-btn" onclick="goHome()">다시 하기</button>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ══ 모드 정의 ══ */
+const MODES = {
+  big:   { q2max:'어느 것이 더 크나요?',   q2min:'어느 것이 더 작나요?',   q3max:'제일 큰 것은?',   q3min:'제일 작은 것은?'   },
+  long:  { q2max:'어느 것이 더 길까요?',   q2min:'어느 것이 더 짧을까요?', q3max:'제일 긴 것은?',   q3min:'제일 짧은 것은?'   },
+  wide:  { q2max:'어느 것이 더 넓나요?',   q2min:'어느 것이 더 좁나요?',   q3max:'제일 넓은 것은?', q3min:'제일 좁은 것은?'   },
+  thick: { q2max:'어느 것이 더 굵나요?',   q2min:'어느 것이 더 얇나요?',   q3max:'제일 굵은 것은?', q3min:'제일 얇은 것은?'   },
+  deep:  { q2max:'어느 것이 더 깊나요?',   q2min:'어느 것이 더 얕나요?',   q3max:'제일 깊은 것은?', q3min:'제일 얕은 것은?'   },
+  many:  { q2max:'어느 쪽이 더 많나요?',   q2min:'어느 쪽이 더 적나요?',   q3max:'제일 많은 것은?', q3min:'제일 적은 것은?'   }
+};
+
+/* ══ SVG 그리기 ══ */
+// level: 0=small, 1=medium, 2=large
+function drawItem(modeId, level) {
+  switch(modeId) {
+    case 'big': {
+      const r = [12, 22, 34][level];
+      return `<svg viewBox="0 0 80 80" width="72" height="72"><circle cx="40" cy="40" r="${r}" fill="#6BADE8" opacity=".85"/></svg>`;
+    }
+    case 'long': {
+      const w = [14, 40, 66][level];
+      const x = (80 - w) / 2;
+      return `<svg viewBox="0 0 80 80" width="80" height="48"><rect x="${x}" y="34" width="${w}" height="12" rx="6" fill="#F0A050"/></svg>`;
+    }
+    case 'wide': {
+      const w = [16, 42, 68][level];
+      const h = 26;
+      const x = (80 - w) / 2, y = (80 - h) / 2;
+      return `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="#5BC886" opacity=".85"/></svg>`;
+    }
+    case 'thick': {
+      const sw = [4, 11, 22][level];
+      return `<svg viewBox="0 0 80 80" width="64" height="72"><line x1="40" y1="8" x2="40" y2="72" stroke="#C080D0" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
+    }
+    case 'deep': {
+      const pct = [0.18, 0.55, 0.90][level];
+      const ch = 56, cTop = 8;
+      const fh = Math.round(ch * pct);
+      const fy = cTop + ch - fh;
+      return `<svg viewBox="0 0 80 80" width="68" height="72">
+        <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
+        <rect x="21" y="${fy}" width="38" height="${fh}" fill="#60B8D8" opacity=".55"/>
+        <rect x="20" y="${cTop}" width="40" height="${ch}" rx="3" fill="none" stroke="#8C7E6A" stroke-width="2.5"/>
+      </svg>`;
+    }
+    case 'many': {
+      const count = [3, 6, 9][level];
+      const cols = 3, r = 7, gap = 20;
+      const rows = Math.ceil(count / cols);
+      const gw = (Math.min(count, cols) - 1) * gap;
+      const gh = (rows - 1) * gap;
+      const sx = (80 - gw) / 2, sy = (80 - gh) / 2;
+      let dots = '';
+      for (let i = 0; i < count; i++) {
+        const cx = sx + (i % cols) * gap;
+        const cy = sy + Math.floor(i / cols) * gap;
+        dots += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#E88070" opacity=".85"/>`;
+      }
+      return `<svg viewBox="0 0 80 80" width="72" height="72">${dots}</svg>`;
+    }
+  }
+}
+
+/* ══ 문제 생성 ══ */
+const PAIRS_2WAY = [[0,2],[0,1],[1,2]];
+
+function generateQuestion(modeId, type) {
+  const n = type === '2way' ? 2 : 3;
+  let levels;
+  if (n === 2) {
+    levels = [...PAIRS_2WAY[Math.floor(Math.random() * PAIRS_2WAY.length)]];
+  } else {
+    levels = [0, 1, 2];
+  }
+  // Shuffle
+  for (let i = levels.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [levels[i], levels[j]] = [levels[j], levels[i]];
+  }
+  const labels = ['A','B','C'].slice(0, n);
+  const items = labels.map((label, i) => ({ label, level: levels[i] }));
+  const direction = Math.random() < 0.5 ? 'max' : 'min';
+  const targetLevel = direction === 'max' ? Math.max(...levels) : Math.min(...levels);
+  const correct = items.find(it => it.level === targetLevel).label;
+  const m = MODES[modeId];
+  const qkey = type === '2way' ? (direction === 'max' ? 'q2max' : 'q2min') : (direction === 'max' ? 'q3max' : 'q3min');
+  return { modeId, type, items, correct, question: m[qkey] };
+}
+
+function generateQuestions(modeId, type, count = 10) {
+  const qs = [];
+  for (let i = 0; i < count; i++) qs.push(generateQuestion(modeId, type));
+  return qs;
+}
+
+/* ══ 상태 ══ */
+let questions = [], currentQ = 0, score = 0, busy = false, delayTimer = null;
+let currentModeId = '', currentType = '';
+let firstAttemptWrong = false;
+let ttsEnabled = true, impulsePrevention = true, impulseMode = 'hide', impulseDelay = 5;
+
+/* ══ 설정 ══ */
+function saveSettings() {
+  localStorage.setItem('slowmath_comparing_settings', JSON.stringify({ ttsEnabled, impulsePrevention, impulseMode, impulseDelay }));
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('slowmath_comparing_settings'));
+    if (!s) return;
+    if (typeof s.ttsEnabled === 'boolean') ttsEnabled = s.ttsEnabled;
+    if (typeof s.impulsePrevention === 'boolean') impulsePrevention = s.impulsePrevention;
+    if (s.impulseMode === 'hide' || s.impulseMode === 'lock') impulseMode = s.impulseMode;
+    if (typeof s.impulseDelay === 'number' && s.impulseDelay >= 1 && s.impulseDelay <= 10) impulseDelay = s.impulseDelay;
+  } catch(e) {}
+}
+function applySettingsUI() {
+  document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+  document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+  document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+  document.querySelectorAll('.impulse-mode-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === impulseMode));
+  document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? '' : 'none';
+  document.querySelectorAll('.imp-sec').forEach((b, i) => b.classList.toggle('active', i + 1 === impulseDelay));
+}
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+  if (!ttsEnabled && window.speechSynthesis) speechSynthesis.cancel();
+  saveSettings();
+}
+function toggleImpulse() {
+  impulsePrevention = !impulsePrevention;
+  document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+  document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+  saveSettings();
+}
+function setImpulseMode(mode) {
+  impulseMode = mode;
+  document.querySelectorAll('.impulse-mode-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === mode));
+  document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? '' : 'none';
+  saveSettings();
+}
+function setImpulseDelay(sec) {
+  impulseDelay = sec;
+  document.querySelectorAll('.imp-sec').forEach((b, i) => b.classList.toggle('active', i + 1 === sec));
+  saveSettings();
+}
+
+/* ══ TTS ══ */
+function speak(text) {
+  if (!ttsEnabled || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.9;
+  setTimeout(() => speechSynthesis.speak(u), 50);
+}
+
+/* ══ 뷰 전환 ══ */
+const VIEWS = ['login-view','start-view','play-view','result-view'];
+function showView(id) {
+  VIEWS.forEach(v => {
+    const el = document.getElementById(v);
+    if (el) el.style.display = (v === id) ? 'flex' : 'none';
+  });
+  if (id !== 'login-view') {
+    document.getElementById(id).classList.remove('hidden');
+  }
+}
+
+/* ══ 로그인 ══ */
+function socialLogin(provider) {
+  localStorage.setItem('slowmath_comparing_login', JSON.stringify({ provider, time: Date.now() }));
+  if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  showView('start-view');
+}
+function logout() {
+  localStorage.removeItem('slowmath_comparing_login');
+  showView('login-view');
+}
+function goHome() {
+  if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
+  busy = false;
+  showView('start-view');
+}
+function shareApp() {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url).then(() => alert('링크가 복사되었습니다!')).catch(() => prompt('링크를 복사하세요:', url));
+  }
+}
+
+/* ══ 게임 시작 ══ */
+function startGame(modeId, type) {
+  if (!localStorage.getItem('slowmath_comparing_login')) { showView('login-view'); return; }
+  currentModeId = modeId;
+  currentType = type;
+  questions = generateQuestions(modeId, type);
+  currentQ = 0; score = 0;
+  document.getElementById('play-score').textContent = '0점';
+  showView('play-view');
+  loadQuestion();
+}
+
+/* ══ 문제 로드 ══ */
+function onNextQ() {
+  document.getElementById('next-q-btn').classList.add('hidden');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  document.getElementById('next-q-btn').classList.add('hidden');
+  if (currentQ >= questions.length) { showResult(); return; }
+  busy = false;
+  firstAttemptWrong = false;
+
+  const q = questions[currentQ];
+  document.getElementById('q-label').textContent = (currentQ + 1) + ' / ' + questions.length;
+  document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('question-prompt').textContent = q.question;
+
+  // Render items
+  const compareRow = document.getElementById('compare-row');
+  compareRow.innerHTML = '';
+  q.items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level)}</div>`;
+    compareRow.appendChild(card);
+  });
+
+  // Render answer buttons
+  const answerRow = document.getElementById('answer-row');
+  answerRow.innerHTML = '';
+  answerRow.style.visibility = '';
+  q.items.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = item.label;
+    btn.dataset.label = item.label;
+    btn.onclick = () => pickAnswer(item.label, q.correct, q);
+    answerRow.appendChild(btn);
+  });
+
+  // Impulse area
+  const impulseArea = document.getElementById('impulse-area');
+  impulseArea.innerHTML = '';
+
+  speak(q.question);
+
+  if (impulsePrevention) {
+    if (impulseMode === 'hide') {
+      answerRow.style.visibility = 'hidden';
+      const btn = document.createElement('button');
+      btn.className = 'reveal-btn';
+      btn.textContent = '보기 확인';
+      btn.onclick = () => { answerRow.style.visibility = 'visible'; btn.remove(); };
+      impulseArea.appendChild(btn);
+    } else {
+      answerRow.querySelectorAll('.answer-btn').forEach(b => { b.style.pointerEvents = 'none'; b.style.opacity = '0.4'; });
+      let remaining = impulseDelay;
+      const cd = document.createElement('div');
+      cd.className = 'delay-countdown';
+      cd.textContent = remaining;
+      impulseArea.appendChild(cd);
+      delayTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(delayTimer); delayTimer = null;
+          cd.remove();
+          answerRow.querySelectorAll('.answer-btn').forEach(b => { b.style.pointerEvents = ''; b.style.opacity = ''; });
+        } else {
+          cd.textContent = remaining;
+        }
+      }, 1000);
+    }
+  }
+}
+
+/* ══ 답 선택 ══ */
+function pickAnswer(picked, correct, q) {
+  if (busy) return;
+  if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
+  document.getElementById('impulse-area').innerHTML = '';
+  document.getElementById('answer-row').style.visibility = '';
+
+  const fb = document.getElementById('feedback');
+  const allBtns = document.querySelectorAll('#answer-row .answer-btn');
+
+  if (picked === correct) {
+    busy = true;
+    allBtns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.label === correct) b.classList.add('correct');
+    });
+    if (!firstAttemptWrong) {
+      score++;
+      document.getElementById('play-score').textContent = score + '점';
+    }
+    fb.textContent = '정답!';
+    fb.className = 'feedback correct';
+    speak('정답!');
+    currentQ++;
+    document.getElementById('next-q-btn').classList.remove('hidden');
+  } else {
+    firstAttemptWrong = true;
+    const btn = document.querySelector(`#answer-row .answer-btn[data-label="${picked}"]`);
+    if (btn) { btn.classList.add('wrong'); btn.disabled = true; }
+    fb.textContent = '다시 골라보세요';
+    fb.className = 'feedback wrong';
+    speak('다시 골라보세요');
+  }
+}
+
+/* ══ 결과 ══ */
+function showResult() {
+  showView('result-view');
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('result-detail').textContent = questions.length + '문제 중 ' + score + '문제 정답';
+  speak(score + '개 맞았어요!');
+}
+
+/* ══ 초기화 ══ */
+(function init() {
+  loadSettings();
+  applySettingsUI();
+  if (localStorage.getItem('slowmath_comparing_login')) {
+    showView('start-view');
+  } else {
+    showView('login-view');
+  }
+  if (window.speechSynthesis) {
+    speechSynthesis.getVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined)
+      speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+  }
+})();
+
+setTimeout(function() {
+  const splash = document.getElementById('splash');
+  if (splash) { splash.classList.add('fade-out'); setTimeout(() => splash.remove(), 500); }
+}, 3000);
+</script>
+</body>
+</html>
