@@ -487,7 +487,7 @@ function shapeAt(shape, cx, cy, r, color) {
       let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rad=i%2===0?r:r*.4; pts+=`${cx+Math.cos(a)*rad},${cy+Math.sin(a)*rad} `;}
       return `<polygon points="${pts.trim()}" fill="${color}" opacity=".85"/>`;
     }
-    case 'heart': { const s=r*1.1; return `<path d="M${cx},${cy+s*.45} C${cx-s*1.35},${cy-s*.25} ${cx-s*1.35},${cy-s*1.15} ${cx},${cy-s*.35} C${cx+s*1.35},${cy-s*1.15} ${cx+s*1.35},${cy-s*.25} ${cx},${cy+s*.45}Z" fill="${color}" opacity=".85"/>`; }
+    case 'heart': { const s=r*1.1; return `<path d="M${cx},${cy+s*.6} C${cx},${cy+s*.6} ${cx-s*1.4},${cy} ${cx-s*1.4},${cy-s*.4} C${cx-s*1.4},${cy-s*1.0} ${cx-s*.7},${cy-s*1.2} ${cx},${cy-s*.55} C${cx+s*.7},${cy-s*1.2} ${cx+s*1.4},${cy-s*1.0} ${cx+s*1.4},${cy-s*.4} C${cx+s*1.4},${cy} ${cx},${cy+s*.6} ${cx},${cy+s*.6}Z" fill="${color}" opacity=".85"/>`; }
   }
 }
 
