@@ -307,14 +307,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
       <div class="mode-card-top">
         <div class="mode-preview-wrap">
           <svg viewBox="0 0 76 52" width="76" height="52" fill="none">
-            <!-- 높은 원기둥 (왼쪽) -->
-            <ellipse cx="22" cy="44" rx="10" ry="3.2" fill="#6BADE8" opacity=".6"/>
-            <rect x="12" y="9" width="20" height="35" fill="#6BADE8" opacity=".8"/>
-            <ellipse cx="22" cy="12" rx="10" ry="3.2" fill="#6BADE8" opacity=".95"/>
-            <!-- 낮은 원기둥 (오른쪽) -->
-            <ellipse cx="54" cy="44" rx="10" ry="3.2" fill="#6BADE8" opacity=".6"/>
-            <rect x="44" y="30" width="20" height="14" fill="#6BADE8" opacity=".8"/>
-            <ellipse cx="54" cy="33" rx="10" ry="3.2" fill="#6BADE8" opacity=".95"/>
+            <!-- 높은 원기둥 (왼쪽, 밑면 y=48 고정) -->
+            <rect x="12" y="8" width="20" height="40" fill="#6BADE8" opacity=".8"/>
+            <ellipse cx="22" cy="48" rx="10" ry="3" fill="#6BADE8" opacity=".7"/>
+            <ellipse cx="22" cy="8" rx="10" ry="3" fill="#6BADE8" opacity=".95"/>
+            <!-- 낮은 원기둥 (오른쪽, 밑면 y=48 고정) -->
+            <rect x="44" y="34" width="20" height="14" fill="#6BADE8" opacity=".8"/>
+            <ellipse cx="54" cy="48" rx="10" ry="3" fill="#6BADE8" opacity=".7"/>
+            <ellipse cx="54" cy="34" rx="10" ry="3" fill="#6BADE8" opacity=".95"/>
           </svg>
         </div>
         <div class="mode-info">
@@ -626,23 +626,24 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true, deepType=
       }
     }
     case 'tall': {
-      // 원기둥 또는 정육면체를 수직으로 세워 높이 차이로 표현
-      const h = itemW !== null ? itemW : [16, 34, 54][level];
+      // 원기둥·직사각기둥을 수직으로 세워 높이 차이 표현
+      // BASE: 밑면 고정 기준선 (모든 도형이 같은 선 위에 서 있도록)
+      const h = itemW !== null ? itemW : [20, 36, 56][level];
+      const BASE = 68, r = 10, ry = 3;
+      const top = BASE - h;
       if (shape === 'cylinder') {
-        const r = 12, ry = Math.round(r * 0.33);
-        const top = 40 - h/2, bot = 40 + h/2;
         return `<svg viewBox="0 0 80 80" width="64" height="72">
-          <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="${col}" opacity=".65"/>
-          <rect x="${40-r}" y="${top+ry}" width="${r*2}" height="${Math.max(1,h-ry*2)}" fill="${col}" opacity=".85"/>
-          <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
+          <rect x="${40-r}" y="${top}" width="${r*2}" height="${h}" fill="${col}" opacity=".85"/>
+          <ellipse cx="40" cy="${BASE}" rx="${r}" ry="${ry}" fill="${col}" opacity=".7"/>
+          <ellipse cx="40" cy="${top}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
         </svg>`;
       } else {
-        // 정육면체 (세로로 긴 직사각 기둥)
-        const sw = 26, ox = 8, oy = 6, x0 = 40 - sw/2, y0 = 40 - h/2;
+        // 직사각 기둥 (isometric)
+        const sw = 26, ox = 9, oy = 6, x0 = 40 - sw/2;
         return `<svg viewBox="0 0 80 80" width="64" height="72">
-          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="${col}" opacity=".6"/>
-          <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="${col}" opacity=".85"/>
-          <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="${col}" opacity=".5"/>
+          <polygon points="${x0},${top} ${x0+ox},${top-oy} ${x0+sw+ox},${top-oy} ${x0+sw},${top}" fill="${col}" opacity=".6"/>
+          <rect x="${x0}" y="${top}" width="${sw}" height="${h}" fill="${col}" opacity=".85"/>
+          <polygon points="${x0+sw},${top} ${x0+sw+ox},${top-oy} ${x0+sw+ox},${top-oy+h} ${x0+sw},${top+h}" fill="${col}" opacity=".5"/>
         </svg>`;
       }
     }
@@ -1087,32 +1088,13 @@ function pickAnswer(picked, correct, q) {
 function showResult() {
   showView('result-view');
   const total = questions.length;
-  const pct = score / total;
-  // 별 (3개 만점)
-  const starCount = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : pct >= 0.3 ? 1 : 0;
-  document.getElementById('result-stars').textContent = '⭐'.repeat(starCount) + '☆'.repeat(3 - starCount);
-  // 점수
+  document.getElementById('result-stars').textContent = '';
   document.getElementById('final-score').textContent = score;
   document.getElementById('result-label').textContent = total + '문제 중 맞힌 문제';
   document.getElementById('result-detail').textContent = '';
-  // 메시지
-  const msgs = [
-    { min: 1.0,  text: '완벽해요! 최고예요!' },
-    { min: 0.8,  text: '정말 잘했어요!' },
-    { min: 0.6,  text: '잘하고 있어요!' },
-    { min: 0.3,  text: '조금 더 연습해봐요' },
-    { min: 0,    text: '괜찮아요, 다시 해봐요!' },
-  ];
-  const msg = msgs.find(m => pct >= m.min).text;
-  document.getElementById('result-msg').textContent = msg;
-  // 별·숫자 애니메이션 재실행 (클래스 리셋)
-  ['result-stars','final-score','result-msg'].forEach(id => {
-    const el = document.getElementById(id);
-    el.style.animation = 'none';
-    el.offsetHeight; // reflow
-    el.style.animation = '';
-  });
-  speak(msg);
+  document.getElementById('result-msg').textContent = '';
+  const el = document.getElementById('final-score');
+  el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
 }
 
 /* ══ 초기화 ══ */
