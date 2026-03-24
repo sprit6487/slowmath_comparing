@@ -66,6 +66,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .toggle-track.on{background:#5BC886;}
 .toggle-knob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .2s;}
 .toggle-track.on .toggle-knob{transform:translateX(20px);}
+.mode-mix-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;}
+.mode-mix-label{font-size:.78rem;font-weight:600;color:var(--warm-500);}
+.toggle-track-sm{width:38px;height:22px;border-radius:99px;position:relative;background:#E0DAD0;border:none;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle-track-sm.on{background:#5BC886;}
+.toggle-track-sm .toggle-knob{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .2s;}
+.toggle-track-sm.on .toggle-knob{transform:translateX(16px);}
 .impulse-mode-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
 .impulse-mode-btn{display:flex;flex-direction:column;align-items:center;padding:10px 8px;border-radius:14px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;font-family:inherit;}
 .impulse-mode-btn.selected{border-color:#C4AA82;background:#FAF5EE;}
@@ -264,6 +270,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-desc">두 가지의 크기를 비교해요</div>
         </div>
       </div>
+      <div class="mode-mix-row">
+        <span class="mode-mix-label">모양 섞기</span>
+        <button id="mix-big" class="toggle-track-sm" onclick="toggleMix('big')"><span class="toggle-knob"></span></button>
+      </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('big','2way')">2개 비교</button>
         <button class="mode-btn" onclick="startGame('big','3way')">3개 비교</button>
@@ -302,6 +312,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-desc">두 가지의 넓이를 비교해요</div>
         </div>
       </div>
+      <div class="mode-mix-row">
+        <span class="mode-mix-label">모양 섞기</span>
+        <button id="mix-wide" class="toggle-track-sm" onclick="toggleMix('wide')"><span class="toggle-knob"></span></button>
+      </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('wide','2way')">2개 비교</button>
         <button class="mode-btn" onclick="startGame('wide','3way')">3개 비교</button>
@@ -320,6 +334,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-title">굵다 얇다</div>
           <div class="mode-desc">두 가지의 굵기를 비교해요</div>
         </div>
+      </div>
+      <div class="mode-mix-row">
+        <span class="mode-mix-label">모양 섞기</span>
+        <button id="mix-thick" class="toggle-track-sm" onclick="toggleMix('thick')"><span class="toggle-knob"></span></button>
       </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('thick','2way')">2개 비교</button>
@@ -367,6 +385,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
           <div class="mode-title">많다 적다</div>
           <div class="mode-desc">두 가지의 수량을 비교해요</div>
         </div>
+      </div>
+      <div class="mode-mix-row">
+        <span class="mode-mix-label">모양 섞기</span>
+        <button id="mix-many" class="toggle-track-sm" onclick="toggleMix('many')"><span class="toggle-knob"></span></button>
       </div>
       <div class="mode-btns">
         <button class="mode-btn" onclick="startGame('many','2way')">2개 비교</button>
@@ -479,6 +501,7 @@ const MANY_SHAPES = ['circle','square','triangle','star','heart','cylinder','cub
 const COLOR_PALETTE = ['#6BADE8','#F0A050','#5BC886','#C080D0','#E88070','#60B8D8','#D4A850','#8FB8E8'];
 const SHAPE_MODES = ['big','many'];
 const WIDE_THICK_SHAPES = ['cylinder','cube','sphere'];
+const MIX_MODES = ['big','many','wide','thick']; // 모양 섞기 지원 모드
 function shapeAt(shape, cx, cy, r, color, filled=true) {
   const sw = Math.max(2.5, r*0.17);
   switch(shape) {
@@ -658,7 +681,7 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true) {
 /* ══ 문제 생성 ══ */
 const PAIRS_2WAY = [[0,2],[0,1],[1,2]];
 
-function generateQuestion(modeId, type) {
+function generateQuestion(modeId, type, mixedShapes=false) {
   const n = type === '2way' ? 2 : 3;
   let levels;
   if (n === 2) {
@@ -680,17 +703,27 @@ function generateQuestion(modeId, type) {
   const qkey = type === '2way' ? (direction === 'max' ? 'q2max' : 'q2min') : (direction === 'max' ? 'q3max' : 'q3min');
   const shapePool = SHAPE_MODES.includes(modeId) ? MANY_SHAPES
     : (modeId === 'wide' || modeId === 'thick') ? WIDE_THICK_SHAPES : null;
-  const shape = shapePool ? shapePool[Math.floor(Math.random() * shapePool.length)] : null;
   const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const LINE_STYLES = ['straight', 'zigzag', 'wavy', 'cylinder', 'cube'];
   const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
   const filled = Math.random() < 0.5;
+
+  // 모양 섞기: 각 아이템마다 다른 모양
+  let shape = null;
+  if (shapePool && mixedShapes) {
+    // 풀을 섞어서 아이템별로 서로 다른 모양 배정
+    const pool = [...shapePool].sort(() => Math.random() - 0.5);
+    items.forEach((item, i) => { item.shape = pool[i % pool.length]; });
+  } else if (shapePool) {
+    shape = shapePool[Math.floor(Math.random() * shapePool.length)];
+  }
+
   return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle, filled };
 }
 
-function generateQuestions(modeId, type, count = 10) {
+function generateQuestions(modeId, type, count=10, mixedShapes=false) {
   const qs = [];
-  for (let i = 0; i < count; i++) qs.push(generateQuestion(modeId, type));
+  for (let i = 0; i < count; i++) qs.push(generateQuestion(modeId, type, mixedShapes));
   return qs;
 }
 
@@ -792,11 +825,17 @@ function shareApp() {
 }
 
 /* ══ 게임 시작 ══ */
+const mixedModes = { big:false, many:false, wide:false, thick:false };
+function toggleMix(modeId) {
+  mixedModes[modeId] = !mixedModes[modeId];
+  document.getElementById(`mix-${modeId}`).classList.toggle('on', mixedModes[modeId]);
+}
+
 function startGame(modeId, type) {
   if (!localStorage.getItem('slowmath_comparing_login')) { showView('login-view'); return; }
   currentModeId = modeId;
   currentType = type;
-  questions = generateQuestions(modeId, type);
+  questions = generateQuestions(modeId, type, 10, mixedModes[modeId] || false);
   currentQ = 0; score = 0;
   document.getElementById('play-score').textContent = '0점';
   showView('play-view');
@@ -829,7 +868,7 @@ function loadQuestion() {
     const card = document.createElement('div');
     card.className = 'item-card';
     card.dataset.label = item.label;
-    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, q.shape, q.color, q.lineStyle, q.filled)}</div>`;
+    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, item.shape||q.shape, q.color, q.lineStyle, q.filled)}</div>`;
     card.onclick = () => pickAnswer(item.label, q.correct, q);
     compareRow.appendChild(card);
   });
