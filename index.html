@@ -123,15 +123,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 
 /* Result View */
 #result-view{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px 0;}
-.result-stars{font-size:2.4rem;letter-spacing:4px;margin-bottom:16px;animation:popIn .5s ease both;}
-.big-score{font-size:4.5rem;font-weight:900;color:#5BC886;line-height:1;animation:popIn .5s .1s ease both;}
-.result-label{font-size:1.1rem;font-weight:600;color:#8C8070;margin-top:8px;}
-.result-detail{font-size:.9rem;color:#B8AD9E;margin-top:4px;}
-.result-msg{font-size:1.3rem;font-weight:800;color:var(--warm-700);margin-top:20px;animation:popIn .5s .2s ease both;}
-.retry-btn{margin-top:24px;padding:14px 48px;border-radius:16px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:1rem;font-weight:700;color:var(--warm-700);cursor:pointer;}
-.retry-btn:active{transform:scale(.95);}
-.home-btn-result{margin-top:10px;padding:10px 32px;border-radius:12px;border:none;background:none;font-family:inherit;font-size:.9rem;font-weight:600;color:var(--warm-400);cursor:pointer;}
-.home-btn-result:active{color:var(--warm-600);}
+.complete-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 10; backdrop-filter: blur(4px); }
+.complete-emoji { font-size: 56px; }
+.complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
+.complete-sub { font-size: 0.85rem; color: #B8AD9E; }
+.next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+.next-btn:active { transform: scale(0.96); }
 
 /* Splash */
 .splash-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
@@ -486,29 +483,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 
 <!-- ══ 결과 화면 ══ -->
 <div id="result-view" class="hidden">
-  <svg viewBox="0 0 120 100" width="100" height="84" fill="none">
-    <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
-    <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
-    <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
-    <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
-    <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
-    <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
-    <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
-    <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
-    <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
-    <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
-    <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
-    <circle cx="101" cy="33" r="1" fill="white"/>
-    <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
-    <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
-  </svg>
-  <div class="result-stars" id="result-stars"></div>
-  <div class="big-score" id="final-score">0</div>
-  <div class="result-label" id="result-label">맞힌 문제</div>
-  <div class="result-detail" id="result-detail"></div>
-  <div class="result-msg" id="result-msg"></div>
-  <button class="retry-btn" onclick="startGame(currentModeId, currentType)">같은 모드 다시</button>
-  <button class="home-btn-result" onclick="goHome()">다른 모드 하기</button>
+  <div class="complete-overlay" style="position:relative;margin-top:40px;">
+    <div class="complete-emoji" id="result-emoji">🏆</div>
+    <div class="complete-msg" id="result-msg"></div>
+    <div class="complete-sub" id="result-detail"></div>
+    <button class="next-btn" onclick="startGame(currentModeId, currentType)">다시 하기</button>
+    <button class="next-btn" onclick="goHome()" style="margin-top:8px;background:#EDE8E0;color:#8C8070;">홈으로</button>
+  </div>
 </div>
 
 </div><!-- .app -->
@@ -1088,13 +1069,9 @@ function pickAnswer(picked, correct, q) {
 function showResult() {
   showView('result-view');
   const total = questions.length;
-  document.getElementById('result-stars').textContent = '';
-  document.getElementById('final-score').textContent = score;
-  document.getElementById('result-label').textContent = total + '문제 중 맞힌 문제';
-  document.getElementById('result-detail').textContent = '';
-  document.getElementById('result-msg').textContent = '';
-  const el = document.getElementById('final-score');
-  el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+  document.getElementById('result-emoji').textContent = score === total ? '🏆' : '👏';
+  document.getElementById('result-msg').textContent = total + '문제 완료!';
+  document.getElementById('result-detail').textContent = total + '문제 중 ' + score + '개 정답';
 }
 
 /* ══ 초기화 ══ */
