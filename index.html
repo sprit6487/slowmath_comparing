@@ -479,52 +479,83 @@ const MANY_SHAPES = ['circle','square','triangle','star','heart','cylinder','cub
 const COLOR_PALETTE = ['#6BADE8','#F0A050','#5BC886','#C080D0','#E88070','#60B8D8','#D4A850','#8FB8E8'];
 const SHAPE_MODES = ['big','many'];
 const WIDE_THICK_SHAPES = ['cylinder','cube','sphere'];
-function shapeAt(shape, cx, cy, r, color) {
+function shapeAt(shape, cx, cy, r, color, filled=true) {
+  const sw = Math.max(2.5, r*0.17);
   switch(shape) {
-    case 'circle': return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>`;
-    case 'square': { const s=r*1.75; return `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="2" fill="${color}" opacity=".85"/>`; }
-    case 'triangle': { const h=r*1.9; return `<polygon points="${cx},${cy-h*.6} ${cx-h*.55},${cy+h*.4} ${cx+h*.55},${cy+h*.4}" fill="${color}" opacity=".85"/>`; }
+    case 'circle':
+      return filled
+        ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
+    case 'square': {
+      const s=r*1.75;
+      return filled
+        ? `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="2" fill="${color}" opacity=".85"/>`
+        : `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="2" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
+    }
+    case 'triangle': {
+      const h=r*1.9, pts=`${cx},${cy-h*.6} ${cx-h*.55},${cy+h*.4} ${cx+h*.55},${cy+h*.4}`;
+      return filled
+        ? `<polygon points="${pts}" fill="${color}" opacity=".85"/>`
+        : `<polygon points="${pts}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
+    }
     case 'star': {
       let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rad=i%2===0?r:r*.4; pts+=`${cx+Math.cos(a)*rad},${cy+Math.sin(a)*rad} `;}
-      return `<polygon points="${pts.trim()}" fill="${color}" opacity=".85"/>`;
+      return filled
+        ? `<polygon points="${pts.trim()}" fill="${color}" opacity=".85"/>`
+        : `<polygon points="${pts.trim()}" fill="none" stroke="${color}" stroke-width="${Math.max(2,sw*.8)}" stroke-linejoin="round" opacity=".9"/>`;
     }
     case 'heart': {
-      // fits within cx±r, cy-r*0.85 ~ cy+r (bottom tip)
-      return `<path d="M${cx},${cy+r} C${cx-r*.4},${cy+r*.5} ${cx-r},${cy+r*.05} ${cx-r},${cy-r*.25} C${cx-r},${cy-r*.78} ${cx-r*.35},${cy-r*.95} ${cx},${cy-r*.48} C${cx+r*.35},${cy-r*.95} ${cx+r},${cy-r*.78} ${cx+r},${cy-r*.25} C${cx+r},${cy+r*.05} ${cx+r*.4},${cy+r*.5} ${cx},${cy+r}Z" fill="${color}" opacity=".85"/>`;
+      const d=`M${cx},${cy+r} C${cx-r*.4},${cy+r*.5} ${cx-r},${cy+r*.05} ${cx-r},${cy-r*.25} C${cx-r},${cy-r*.78} ${cx-r*.35},${cy-r*.95} ${cx},${cy-r*.48} C${cx+r*.35},${cy-r*.95} ${cx+r},${cy-r*.78} ${cx+r},${cy-r*.25} C${cx+r},${cy+r*.05} ${cx+r*.4},${cy+r*.5} ${cx},${cy+r}Z`;
+      return filled
+        ? `<path d="${d}" fill="${color}" opacity=".85"/>`
+        : `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
     }
     case 'cylinder': {
       const ry=r*.3, h=r*1.7, top=cy-h/2+ry, bot=cy+h/2-ry;
-      return `<ellipse cx="${cx}" cy="${bot}" rx="${r}" ry="${ry}" fill="${color}" opacity=".65"/>
+      return filled
+        ? `<ellipse cx="${cx}" cy="${bot}" rx="${r}" ry="${ry}" fill="${color}" opacity=".65"/>
 <rect x="${cx-r}" y="${top}" width="${r*2}" height="${bot-top}" fill="${color}" opacity=".85"/>
-<ellipse cx="${cx}" cy="${top}" rx="${r}" ry="${ry}" fill="${color}" opacity=".95"/>`;
+<ellipse cx="${cx}" cy="${top}" rx="${r}" ry="${ry}" fill="${color}" opacity=".95"/>`
+        : `<line x1="${cx-r}" y1="${top}" x2="${cx-r}" y2="${bot}" stroke="${color}" stroke-width="${sw}" opacity=".9"/>
+<line x1="${cx+r}" y1="${top}" x2="${cx+r}" y2="${bot}" stroke="${color}" stroke-width="${sw}" opacity=".9"/>
+<ellipse cx="${cx}" cy="${bot}" rx="${r}" ry="${ry}" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>
+<ellipse cx="${cx}" cy="${top}" rx="${r}" ry="${ry}" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
     }
     case 'cube': {
       const s=r*1.3, ox=s*.38, oy=s*.24, x0=cx-s/2, y0=cy-s/2+oy/2;
-      return `<polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+ox+s},${y0-oy} ${x0+s},${y0}" fill="${color}" opacity=".6"/>
+      return filled
+        ? `<polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+ox+s},${y0-oy} ${x0+s},${y0}" fill="${color}" opacity=".6"/>
 <rect x="${x0}" y="${y0}" width="${s}" height="${s}" rx="2" fill="${color}" opacity=".85"/>
-<polygon points="${x0+s},${y0} ${x0+s+ox},${y0-oy} ${x0+s+ox},${y0-oy+s} ${x0+s},${y0+s}" fill="${color}" opacity=".5"/>`;
+<polygon points="${x0+s},${y0} ${x0+s+ox},${y0-oy} ${x0+s+ox},${y0-oy+s} ${x0+s},${y0+s}" fill="${color}" opacity=".5"/>`
+        : `<polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+ox+s},${y0-oy} ${x0+s},${y0}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>
+<rect x="${x0}" y="${y0}" width="${s}" height="${s}" rx="2" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>
+<polygon points="${x0+s},${y0} ${x0+s+ox},${y0-oy} ${x0+s+ox},${y0-oy+s} ${x0+s},${y0+s}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
     }
     case 'sphere': {
-      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>
-<ellipse cx="${cx-r*.25}" cy="${cy-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>`;
+      return filled
+        ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".85"/>
+<ellipse cx="${cx-r*.25}" cy="${cy-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
     }
   }
 }
 
 // level: 0=small, 1=medium, 2=large
-function drawItem(modeId, level, shape, color, lineStyle) {
+function drawItem(modeId, level, shape, color, lineStyle, filled=true) {
   const col = color || '#6BADE8';
   switch(modeId) {
     case 'big': {
       const r = [12, 22, 34][level];
-      return `<svg viewBox="0 0 80 80" width="72" height="72">${shapeAt(shape||'circle', 40, 40, r, col)}</svg>`;
+      return `<svg viewBox="0 0 80 80" width="72" height="72">${shapeAt(shape||'circle', 40, 40, r, col, filled)}</svg>`;
     }
     case 'long': {
       const w = [26, 46, 68][level];
       const x0 = (80 - w) / 2, cy = 40;
       const style = lineStyle || 'straight';
       if (style === 'straight') {
-        return `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="${col}"/></svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="72"><rect x="${x0}" y="${cy-6}" width="${w}" height="12" rx="6" fill="none" stroke="${col}" stroke-width="3"/></svg>`;
       } else if (style === 'zigzag') {
         const amp=9, nSegs=Math.max(2,Math.round(w/12)), segW=w/nSegs;
         let pts=`${x0},${cy}`;
@@ -537,68 +568,101 @@ function drawItem(modeId, level, shape, color, lineStyle) {
         return `<svg viewBox="0 0 80 80" width="80" height="72"><path d="${d}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/></svg>`;
       } else if (style === 'cylinder') {
         const ry=9, bodyW=Math.max(1,w-ry*2);
-        return `<svg viewBox="0 0 80 80" width="80" height="72">
-          <rect x="${x0+ry}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="${col}" opacity=".85"/>
-          <circle cx="${x0+ry+bodyW}" cy="${cy}" r="${ry}" fill="${col}" opacity=".7"/>
-          <circle cx="${x0+ry}" cy="${cy}" r="${ry}" fill="${col}" opacity=".95"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="72">
+            <rect x="${x0+ry}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="${col}" opacity=".85"/>
+            <circle cx="${x0+ry+bodyW}" cy="${cy}" r="${ry}" fill="${col}" opacity=".7"/>
+            <circle cx="${x0+ry}" cy="${cy}" r="${ry}" fill="${col}" opacity=".95"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="72">
+            <rect x="${x0+ry}" y="${cy-ry}" width="${bodyW}" height="${ry*2}" fill="none" stroke="${col}" stroke-width="3"/>
+            <circle cx="${x0+ry+bodyW}" cy="${cy}" r="${ry}" fill="none" stroke="${col}" stroke-width="3"/>
+            <circle cx="${x0+ry}" cy="${cy}" r="${ry}" fill="none" stroke="${col}" stroke-width="3"/>
+          </svg>`;
       } else {
         // cube
         const bh=16, ox=5, oy=5, y0=32;
-        return `<svg viewBox="0 0 80 80" width="80" height="72">
-          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".62"/>
-          <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
-          <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="72">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".62"/>
+            <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
+            <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="72">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>
+            <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="none" stroke="${col}" stroke-width="3"/>
+            <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>
+          </svg>`;
       }
     }
     case 'wide': {
       if (shape === 'cylinder') {
         const w=[22,46,70][level], h=22, r=h/2, bodyW=Math.max(0,w-h), x0=(80-w)/2;
-        return `<svg viewBox="0 0 80 80" width="80" height="64">
-          <rect x="${x0+r}" y="${40-r}" width="${bodyW}" height="${h}" fill="${col}" opacity=".85"/>
-          <circle cx="${x0+r}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
-          <circle cx="${x0+r+bodyW}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="64">
+            <rect x="${x0+r}" y="${40-r}" width="${bodyW}" height="${h}" fill="${col}" opacity=".85"/>
+            <circle cx="${x0+r}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+            <circle cx="${x0+r+bodyW}" cy="40" r="${r}" fill="${col}" opacity=".85"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="64">
+            <rect x="${x0+r}" y="${40-r}" width="${bodyW}" height="${h}" fill="none" stroke="${col}" stroke-width="3"/>
+            <circle cx="${x0+r}" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="3"/>
+            <circle cx="${x0+r+bodyW}" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="3"/>
+          </svg>`;
       } else if (shape === 'cube') {
         const w=[18,42,66][level], bh=22, ox=8, oy=6, x0=(80-w)/2, y0=37;
-        return `<svg viewBox="0 0 80 80" width="80" height="64">
-          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".6"/>
-          <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
-          <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="64">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="${col}" opacity=".6"/>
+            <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="${col}" opacity=".85"/>
+            <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="${col}" opacity=".5"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="64">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+w+ox},${y0-oy} ${x0+w},${y0}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>
+            <rect x="${x0}" y="${y0}" width="${w}" height="${bh}" rx="2" fill="none" stroke="${col}" stroke-width="3"/>
+            <polygon points="${x0+w},${y0} ${x0+w+ox},${y0-oy} ${x0+w+ox},${y0-oy+bh} ${x0+w},${y0+bh}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>
+          </svg>`;
       } else if (shape === 'sphere') {
         const r=[13,23,35][level];
-        return `<svg viewBox="0 0 80 80" width="80" height="64">
-          <circle cx="40" cy="40" r="${r}" fill="${col}" opacity=".85"/>
-          <ellipse cx="${40-r*.25}" cy="${40-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>
-        </svg>`;
+        return `<svg viewBox="0 0 80 80" width="80" height="64">${shapeAt('sphere', 40, 40, r, col, filled)}</svg>`;
       } else {
         const w=[16,42,68][level], h=26, x=(80-w)/2, y=(80-h)/2;
-        return `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${col}" opacity=".85"/></svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${col}" opacity=".85"/></svg>`
+          : `<svg viewBox="0 0 80 80" width="80" height="64"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="none" stroke="${col}" stroke-width="3" opacity=".9"/></svg>`;
       }
     }
     case 'thick': {
       if (shape === 'cylinder') {
         const d=[8,18,30][level], r=d/2, ry=r*.32, h=50, top=15, bot=top+h-ry;
-        return `<svg viewBox="0 0 80 80" width="64" height="72">
-          <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="${col}" opacity=".65"/>
-          <rect x="${40-r}" y="${top+ry}" width="${d}" height="${h-ry*2}" fill="${col}" opacity=".85"/>
-          <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="64" height="72">
+            <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="${col}" opacity=".65"/>
+            <rect x="${40-r}" y="${top+ry}" width="${d}" height="${h-ry*2}" fill="${col}" opacity=".85"/>
+            <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="${col}" opacity=".95"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="64" height="72">
+            <line x1="${40-r}" y1="${top+ry}" x2="${40-r}" y2="${bot}" stroke="${col}" stroke-width="3" opacity=".9"/>
+            <line x1="${40+r}" y1="${top+ry}" x2="${40+r}" y2="${bot}" stroke="${col}" stroke-width="3" opacity=".9"/>
+            <ellipse cx="40" cy="${bot}" rx="${r}" ry="${ry}" fill="none" stroke="${col}" stroke-width="3" opacity=".9"/>
+            <ellipse cx="40" cy="${top+ry}" rx="${r}" ry="${ry}" fill="none" stroke="${col}" stroke-width="3" opacity=".9"/>
+          </svg>`;
       } else if (shape === 'cube') {
         const sw=[8,18,30][level], h=50, ox=6, oy=5, x0=40-sw/2, y0=15;
-        return `<svg viewBox="0 0 80 80" width="64" height="72">
-          <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="${col}" opacity=".6"/>
-          <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="${col}" opacity=".85"/>
-          <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="${col}" opacity=".5"/>
-        </svg>`;
+        return filled
+          ? `<svg viewBox="0 0 80 80" width="64" height="72">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="${col}" opacity=".6"/>
+            <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="${col}" opacity=".85"/>
+            <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="${col}" opacity=".5"/>
+          </svg>`
+          : `<svg viewBox="0 0 80 80" width="64" height="72">
+            <polygon points="${x0},${y0} ${x0+ox},${y0-oy} ${x0+sw+ox},${y0-oy} ${x0+sw},${y0}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round" opacity=".9"/>
+            <rect x="${x0}" y="${y0}" width="${sw}" height="${h}" rx="2" fill="none" stroke="${col}" stroke-width="3" opacity=".9"/>
+            <polygon points="${x0+sw},${y0} ${x0+sw+ox},${y0-oy} ${x0+sw+ox},${y0-oy+h} ${x0+sw},${y0+h}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round" opacity=".9"/>
+          </svg>`;
       } else if (shape === 'sphere') {
         const r=[10,19,30][level];
-        return `<svg viewBox="0 0 80 80" width="64" height="72">
-          <circle cx="40" cy="40" r="${r}" fill="${col}" opacity=".85"/>
-          <ellipse cx="${40-r*.25}" cy="${40-r*.28}" rx="${r*.28}" ry="${r*.2}" fill="white" opacity=".38"/>
-        </svg>`;
+        return `<svg viewBox="0 0 80 80" width="64" height="72">${shapeAt('sphere', 40, 40, r, col, filled)}</svg>`;
       } else {
         const sw=[4,11,22][level];
         return `<svg viewBox="0 0 80 80" width="64" height="72"><line x1="40" y1="8" x2="40" y2="72" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
@@ -627,7 +691,7 @@ function drawItem(modeId, level, shape, color, lineStyle) {
       for (let i = 0; i < count; i++) {
         const cx = sx + (i % cols) * gap;
         const cy = sy + Math.floor(i / cols) * gap;
-        items += shapeAt(shape||'circle', cx, cy, r, col);
+        items += shapeAt(shape||'circle', cx, cy, r, col, filled);
       }
       return `<svg viewBox="0 0 80 80" width="72" height="72">${items}</svg>`;
     }
@@ -663,7 +727,8 @@ function generateQuestion(modeId, type) {
   const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const LINE_STYLES = ['straight', 'zigzag', 'wavy', 'cylinder', 'cube'];
   const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
-  return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle };
+  const filled = Math.random() < 0.5;
+  return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle, filled };
 }
 
 function generateQuestions(modeId, type, count = 10) {
@@ -807,7 +872,7 @@ function loadQuestion() {
     const card = document.createElement('div');
     card.className = 'item-card';
     card.dataset.label = item.label;
-    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, q.shape, q.color, q.lineStyle)}</div>`;
+    card.innerHTML = `<div class="item-label">${item.label}</div><div class="item-visual">${drawItem(q.modeId, item.level, q.shape, q.color, q.lineStyle, q.filled)}</div>`;
     card.onclick = () => pickAnswer(item.label, q.correct, q);
     compareRow.appendChild(card);
   });
