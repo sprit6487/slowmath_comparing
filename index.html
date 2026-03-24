@@ -123,11 +123,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 
 /* Result View */
 #result-view{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px 0;}
-.big-score{font-size:4rem;font-weight:900;color:#5BC886;line-height:1;}
+.result-stars{font-size:2.4rem;letter-spacing:4px;margin-bottom:16px;animation:popIn .5s ease both;}
+.big-score{font-size:4.5rem;font-weight:900;color:#5BC886;line-height:1;animation:popIn .5s .1s ease both;}
 .result-label{font-size:1.1rem;font-weight:600;color:#8C8070;margin-top:8px;}
 .result-detail{font-size:.9rem;color:#B8AD9E;margin-top:4px;}
-.retry-btn{margin-top:32px;padding:14px 48px;border-radius:16px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:1rem;font-weight:700;color:var(--warm-700);cursor:pointer;}
+.result-msg{font-size:1.3rem;font-weight:800;color:var(--warm-700);margin-top:20px;animation:popIn .5s .2s ease both;}
+.retry-btn{margin-top:24px;padding:14px 48px;border-radius:16px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:1rem;font-weight:700;color:var(--warm-700);cursor:pointer;}
 .retry-btn:active{transform:scale(.95);}
+.home-btn-result{margin-top:10px;padding:10px 32px;border-radius:12px;border:none;background:none;font-family:inherit;font-size:.9rem;font-weight:600;color:var(--warm-400);cursor:pointer;}
+.home-btn-result:active{color:var(--warm-600);}
 
 /* Splash */
 .splash-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
@@ -473,10 +477,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
     <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
     <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
   </svg>
+  <div class="result-stars" id="result-stars"></div>
   <div class="big-score" id="final-score">0</div>
-  <div class="result-label">맞힌 문제</div>
+  <div class="result-label" id="result-label">맞힌 문제</div>
   <div class="result-detail" id="result-detail"></div>
-  <button class="retry-btn" onclick="goHome()">다시 하기</button>
+  <div class="result-msg" id="result-msg"></div>
+  <button class="retry-btn" onclick="startGame(currentModeId, currentType)">같은 모드 다시</button>
+  <button class="home-btn-result" onclick="goHome()">다른 모드 하기</button>
 </div>
 
 </div><!-- .app -->
@@ -724,7 +731,7 @@ const PAIRS_2WAY_BY_MODE = {
 const PAIRS_2WAY_DEFAULT = [[0,2]];
 let _svgIdCtr = 0;
 
-function generateQuestion(modeId, type, mixedShapes=false) {
+function generateQuestion(modeId, type, mixedShapes=false, colorOverride=null, shapeOverride=null) {
   const n = type === '2way' ? 2 : 3;
   let levels;
   if (n === 2) {
@@ -748,7 +755,7 @@ function generateQuestion(modeId, type, mixedShapes=false) {
   const shapePool = SHAPE_MODES.includes(modeId) ? MANY_SHAPES
     : modeId === 'thick' ? THICK_SHAPES
     : modeId === 'wide' ? WIDE_SHAPES : null;
-  const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+  const color = colorOverride || COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const LINE_STYLES = ['line','rect'];
   const lineStyle = modeId === 'long' ? LINE_STYLES[Math.floor(Math.random() * LINE_STYLES.length)] : null;
   const filled = Math.random() < 0.5;
@@ -760,7 +767,7 @@ function generateQuestion(modeId, type, mixedShapes=false) {
     const pool = [...shapePool].sort(() => Math.random() - 0.5);
     items.forEach((item, i) => { item.shape = pool[i % pool.length]; });
   } else if (shapePool) {
-    shape = shapePool[Math.floor(Math.random() * shapePool.length)];
+    shape = shapeOverride || shapePool[Math.floor(Math.random() * shapePool.length)];
   }
   // 레벨별 범위 안에서 랜덤 값 할당해 차이를 다양하게
   const extraRanges = {
@@ -799,9 +806,24 @@ function generateQuestion(modeId, type, mixedShapes=false) {
   return { modeId, type, items, correct, question: m[qkey], shape, color, lineStyle, filled, deepType };
 }
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
 function generateQuestions(modeId, type, count=10, mixedShapes=false) {
+  // 세션 내 색상 중복 방지: 팔레트를 섞어 순서대로 배분 (10문제 > 8색이면 두 바퀴)
+  const colorQueue = [];
+  while (colorQueue.length < count) colorQueue.push(...shuffle(COLOR_PALETTE));
+  // 세션 내 도형 중복 방지: 도형도 미리 섞어 배분
+  const shapePool = SHAPE_MODES.includes(modeId) ? MANY_SHAPES
+    : modeId === 'thick' ? THICK_SHAPES
+    : modeId === 'wide' ? WIDE_SHAPES : null;
+  const shapeQueue = [];
+  if (shapePool) { while (shapeQueue.length < count) shapeQueue.push(...shuffle(shapePool)); }
   const qs = [];
-  for (let i = 0; i < count; i++) qs.push(generateQuestion(modeId, type, mixedShapes));
+  for (let i = 0; i < count; i++)
+    qs.push(generateQuestion(modeId, type, mixedShapes, colorQueue[i], shapeQueue[i] || null));
   return qs;
 }
 
@@ -1013,9 +1035,33 @@ function pickAnswer(picked, correct, q) {
 /* ══ 결과 ══ */
 function showResult() {
   showView('result-view');
+  const total = questions.length;
+  const pct = score / total;
+  // 별 (3개 만점)
+  const starCount = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : pct >= 0.3 ? 1 : 0;
+  document.getElementById('result-stars').textContent = '⭐'.repeat(starCount) + '☆'.repeat(3 - starCount);
+  // 점수
   document.getElementById('final-score').textContent = score;
-  document.getElementById('result-detail').textContent = questions.length + '문제 중 ' + score + '문제 정답';
-  speak(score + '개 맞았어요!');
+  document.getElementById('result-label').textContent = total + '문제 중 맞힌 문제';
+  document.getElementById('result-detail').textContent = '';
+  // 메시지
+  const msgs = [
+    { min: 1.0,  text: '완벽해요! 최고예요!' },
+    { min: 0.8,  text: '정말 잘했어요!' },
+    { min: 0.6,  text: '잘하고 있어요!' },
+    { min: 0.3,  text: '조금 더 연습해봐요' },
+    { min: 0,    text: '괜찮아요, 다시 해봐요!' },
+  ];
+  const msg = msgs.find(m => pct >= m.min).text;
+  document.getElementById('result-msg').textContent = msg;
+  // 별·숫자 애니메이션 재실행 (클래스 리셋)
+  ['result-stars','final-score','result-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+  });
+  speak(msg);
 }
 
 /* ══ 초기화 ══ */
