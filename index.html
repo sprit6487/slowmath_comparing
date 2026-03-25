@@ -943,6 +943,7 @@ function showView(id) {
 function socialLogin(provider) {
   localStorage.setItem('slowmath_comparing_login', JSON.stringify({ provider, time: Date.now() }));
   if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  const _sp=sessionStorage.getItem('_sp');if(_sp){sessionStorage.removeItem('_sp');startGame(...JSON.parse(_sp));return;}
   showView('start-view');
 }
 function logout() {
@@ -971,7 +972,7 @@ function toggleMix(modeId) {
 }
 
 function startGame(modeId, type) {
-  if (!localStorage.getItem('slowmath_comparing_login')) { showView('login-view'); return; }
+  if (!localStorage.getItem('slowmath_comparing_login')) { sessionStorage.setItem('_sp',JSON.stringify([modeId,type])); showView('login-view'); return; }
   currentModeId = modeId;
   currentType = type;
   questions = generateQuestions(modeId, type, 10, mixedModes[modeId] || false);
