@@ -548,7 +548,7 @@ function shapeAt(shape, cx, cy, r, color, filled=true) {
         : `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="2" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
     }
     case 'triangle': {
-      const h=r*1.9, pts=`${cx},${cy-h*.6} ${cx-h*.55},${cy+h*.4} ${cx+h*.55},${cy+h*.4}`;
+      const h=r*1.9, pts=`${cx},${cy-h*.5} ${cx-h*.55},${cy+h*.5} ${cx+h*.55},${cy+h*.5}`;
       return filled
         ? `<polygon points="${pts}" fill="${color}" opacity=".85"/>`
         : `<polygon points="${pts}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
@@ -697,7 +697,7 @@ function drawItem(modeId, level, shape, color, lineStyle, filled=true, deepType=
         switch(shape) {
           case 'circle': el=`<circle cx="40" cy="40" r="${r2d}" fill="none" stroke="${col}" stroke-width="${sw2d}" opacity=".9"/>`; break;
           case 'square': { const s=r2d*1.75; el=`<rect x="${40-s/2}" y="${40-s/2}" width="${s}" height="${s}" rx="2" fill="none" stroke="${col}" stroke-width="${sw2d}" opacity=".9"/>`; break; }
-          case 'triangle': { const h=r2d*1.9; el=`<polygon points="40,${40-h*.6} ${40-h*.55},${40+h*.4} ${40+h*.55},${40+h*.4}" fill="none" stroke="${col}" stroke-width="${sw2d}" stroke-linejoin="round" opacity=".9"/>`; break; }
+          case 'triangle': { const h=r2d*1.9; el=`<polygon points="40,${40-h*.5} ${40-h*.55},${40+h*.5} ${40+h*.55},${40+h*.5}" fill="none" stroke="${col}" stroke-width="${sw2d}" stroke-linejoin="round" opacity=".9"/>`; break; }
           case 'star': { let pts=''; for(let i=0;i<10;i++){const a=(i*36-90)*Math.PI/180,rad=i%2===0?r2d:r2d*.4; pts+=`${40+Math.cos(a)*rad},${40+Math.sin(a)*rad} `;} el=`<polygon points="${pts.trim()}" fill="none" stroke="${col}" stroke-width="${Math.max(2,sw2d*.8)}" stroke-linejoin="round" opacity=".9"/>`; break; }
           case 'heart': { const d=`M40,${40+r2d} C${40-r2d*.4},${40+r2d*.5} ${40-r2d},${40+r2d*.05} ${40-r2d},${40-r2d*.25} C${40-r2d},${40-r2d*.78} ${40-r2d*.35},${40-r2d*.95} 40,${40-r2d*.48} C${40+r2d*.35},${40-r2d*.95} ${40+r2d},${40-r2d*.78} ${40+r2d},${40-r2d*.25} C${40+r2d},${40+r2d*.05} ${40+r2d*.4},${40+r2d*.5} 40,${40+r2d}Z`; el=`<path d="${d}" fill="none" stroke="${col}" stroke-width="${sw2d}" stroke-linejoin="round" opacity=".9"/>`; break; }
         }
