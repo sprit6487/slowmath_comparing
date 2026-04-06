@@ -1254,11 +1254,7 @@ function showResult() {
 (function init() {
   loadSettings();
   applySettingsUI();
-  if (localStorage.getItem('slowmath_comparing_login')) {
-    showView('start-view');
-  } else {
-    showView('login-view');
-  }
+  showView('start-view');
   if (window.speechSynthesis) {
     speechSynthesis.getVoices();
     if (speechSynthesis.onvoiceschanged !== undefined)
