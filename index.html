@@ -1069,6 +1069,7 @@ function showView(id) {
   }
   const lb=document.querySelector('.logout-btn');if(lb)lb.style.display=id==='start-view'&&localStorage.getItem('slowmath_comparing_login')?'':'none';
 }
+showView('start-view'); // init
 
 /* ══ 로그인 ══ */
 function socialLogin(provider) {
@@ -1080,7 +1081,7 @@ function socialLogin(provider) {
 }
 function logout() {
   localStorage.removeItem('slowmath_comparing_login');
-  showView('login-view');
+  showView('start-view');
 }
 function goHome() {
   if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
